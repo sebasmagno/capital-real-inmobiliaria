@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
 
 @Component({
@@ -9,32 +9,31 @@ import { PropertyService, Property } from '../../../core/services/property';
   templateUrl: './property-detail.html',
   styleUrl: './property-detail.css'
 })
-export class PropertyDetail implements OnInit {
-  private route = inject(ActivatedRoute);
+export class PropertyDetail {
   private propertyService = inject(PropertyService);
+  
+  // Recibimos el ID directamente del Router mediante un input de señal
+  id = input.required<string>();
   
   property = signal<Property | null>(null);
   selectedImageIndex = signal<number | null>(null);
 
-  ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadProperty(id);
-      }
+  constructor() {
+    // Reaccionamos automáticamente cuando el ID cambia
+    effect(() => {
+      const currentId = this.id();
+      this.loadProperty(currentId);
     });
   }
 
-  loadProperty(id: string) {
+  private loadProperty(id: string) {
     this.propertyService.getPropertyById(id).subscribe({
       next: (res) => {
         if (res.success) {
           this.property.set(res.data);
         }
       },
-      error: (err) => {
-        console.error('Error cargando propiedad', err);
-      }
+      error: (err) => console.error('Error cargando propiedad', err)
     });
   }
 

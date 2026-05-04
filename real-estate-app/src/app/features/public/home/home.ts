@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,11 +14,14 @@ import { PropertyService, Property } from '../../../core/services/property';
 export class Home implements OnInit {
   private router = inject(Router);
   private propertyService = inject(PropertyService);
+  private title = inject(Title);
+  private meta = inject(Meta);
   
   searchQuery = signal('');
   featuredProperties = signal<Property[]>([]);
 
   ngOnInit() {
+    this.updateSEO();
     this.propertyService.getFeaturedProperties().subscribe(res => {
       if (res.success) {
         // Filtramos localmente para destacar solo las 'featured' y máximo 3
@@ -25,6 +29,14 @@ export class Home implements OnInit {
         this.featuredProperties.set(featured);
       }
     });
+  }
+
+  private updateSEO() {
+    this.title.setTitle('CAPITAL REAL INMOBILIARIA | Encuentra tu hogar perfecto');
+    this.meta.updateTag({ name: 'description', content: 'Explora las mejores propiedades en venta y alquiler con CAPITAL REAL INMOBILIARIA. Casas, apartamentos y locales exclusivos en las mejores ubicaciones.' });
+    this.meta.updateTag({ property: 'og:title', content: 'CAPITAL REAL INMOBILIARIA - Tu próxima propiedad' });
+    this.meta.updateTag({ property: 'og:description', content: 'Busca y encuentra la propiedad ideal para ti con nuestro buscador inteligente.' });
+    this.meta.updateTag({ property: 'og:image', content: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9' });
   }
 
   onSearch() {
