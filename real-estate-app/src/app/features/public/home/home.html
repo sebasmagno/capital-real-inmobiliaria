@@ -1,0 +1,100 @@
+<div class="flex flex-col gap-16 pb-16">
+  <!-- Hero Section -->
+  <section class="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0 z-0">
+      <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80" alt="Luxury Home" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+      <span class="inline-block py-1 px-3 rounded-full bg-primary-500/20 text-primary-100 backdrop-blur-md border border-primary-400/30 text-sm font-medium mb-6 animate-fade-in-up">
+        Descubre tu próximo hogar
+      </span>
+      <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg leading-tight animate-fade-in-up" style="animation-delay: 100ms;">
+        Encuentra la propiedad <span class="text-primary-400 italic">perfecta</span> para ti
+      </h1>
+      <p class="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light animate-fade-in-up" style="animation-delay: 200ms;">
+        Explora la mejor selección de casas, apartamentos y propiedades exclusivas en las ubicaciones más deseadas.
+      </p>
+
+      <!-- Search Bar -->
+      <div class="bg-white p-2 rounded-full shadow-2xl flex flex-col md:flex-row gap-2 max-w-3xl mx-auto animate-fade-in-up" style="animation-delay: 300ms;">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="¿Dónde quieres vivir? (Ej. Madrid, Barcelona...)" class="flex-grow px-6 py-4 rounded-full bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-800 placeholder:text-slate-400" />
+        <button (click)="onSearch()" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full font-medium transition-all shadow-md flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          Buscar
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Properties Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <div class="flex justify-between items-end mb-10">
+      <div>
+        <h2 class="text-3xl font-bold text-slate-900 mb-2">Propiedades Destacadas</h2>
+        <p class="text-slate-500">Seleccionadas cuidadosamente por nuestros expertos</p>
+      </div>
+      <a href="#" class="hidden sm:flex text-primary-600 font-medium hover:text-primary-800 items-center gap-1 transition-colors">
+        Ver todas
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Properties Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (property of featuredProperties(); track property.id) {
+        <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
+          <div class="relative h-64 overflow-hidden">
+            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-900 shadow-sm">
+              {{ property.status }}
+            </div>
+            @if (property.featured) {
+              <div class="absolute top-4 right-4 z-10 bg-primary-600/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm">
+                Destacado
+              </div>
+            }
+            <img [src]="'http://localhost:3000' + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" [alt]="property.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">{{ property.title }}</h3>
+            <p class="text-slate-500 text-sm mb-4 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              {{ property.location }}
+            </p>
+            <div class="flex items-center gap-4 text-slate-600 text-sm mb-6 border-b border-slate-100 pb-6">
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-slate-900">{{ property.bedrooms }}</span> Habs
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-slate-900">{{ property.bathrooms }}</span> Baños
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-slate-900">{{ property.area }}</span> m²
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-primary-600">{{ property.price | currency:'COP':'symbol':'1.0-0' }}</span>
+              <button routerLink="/propiedades/{{ property.id }}" class="text-primary-600 hover:text-primary-800 transition-colors font-medium text-sm flex items-center gap-1">
+                Ver detalle
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</div>

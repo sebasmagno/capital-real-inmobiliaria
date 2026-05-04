@@ -1,0 +1,85 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Propiedades</h1>
+      <p class="text-slate-500 text-sm">Gestiona tu catálogo de propiedades</p>
+    </div>
+    <a routerLink="/admin/properties/new" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Nueva Propiedad
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 flex justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+    </div>
+  } @else {
+    <!-- Properties Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-slate-900 uppercase font-medium border-b border-slate-200">
+            <tr>
+              <th scope="col" class="px-6 py-4">Propiedad</th>
+              <th scope="col" class="px-6 py-4">Ubicación</th>
+              <th scope="col" class="px-6 py-4">Precio</th>
+              <th scope="col" class="px-6 py-4">Estado</th>
+              <th scope="col" class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (property of properties(); track property.id) {
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-4">
+                    <img [src]="'http://localhost:3000' + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" [alt]="property.title" class="w-12 h-12 rounded-lg object-cover border border-slate-200">
+                    <div>
+                      <div class="font-bold text-slate-900">{{ property.title }}</div>
+                      <div class="text-xs text-slate-500">{{ property.type }} • {{ property.bedrooms }} Habs</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">{{ property.location }}</td>
+                <td class="px-6 py-4 font-medium text-slate-900">{{ property.price | currency:'COP':'symbol':'1.0-0' }}</td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    {{ property.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-3">
+                    <!-- Edit Button -->
+                    <a [routerLink]="['/admin/properties/edit', property.id]" class="text-primary-600 hover:text-primary-900 transition-colors" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                      </svg>
+                    </a>
+                    <!-- Delete Button -->
+                    <button (click)="deleteProperty(property.id)" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+
+            @if (properties().length === 0) {
+              <tr>
+                <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                  No tienes ninguna propiedad registrada. ¡Comienza agregando una nueva!
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

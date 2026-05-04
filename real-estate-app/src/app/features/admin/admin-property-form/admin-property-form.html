@@ -1,0 +1,194 @@
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex items-center gap-4">
+    <a routerLink="/admin" class="p-2 bg-white rounded-full shadow-sm hover:bg-slate-50 text-slate-600 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+    </a>
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">{{ isEditMode() ? 'Editar Propiedad' : 'Nueva Propiedad' }}</h1>
+      <p class="text-slate-500 text-sm">Completa los datos de la propiedad para publicarla en el catálogo</p>
+    </div>
+  </div>
+
+  @if (isLoadingData()) {
+    <div class="bg-white rounded-xl shadow-sm p-12 flex justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+    </div>
+  } @else {
+    <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()" class="space-y-8">
+      
+      <!-- Error general -->
+      @if (errorMessage()) {
+        <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <p class="font-medium text-sm">{{ errorMessage() }}</p>
+        </div>
+      }
+
+      <!-- Información Principal -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">Información Básica</h2>
+        
+        <div class="grid grid-cols-1 gap-6">
+          <!-- Título -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Título de la Propiedad *</label>
+            <input type="text" formControlName="title" placeholder="Ej: Villa Moderna en la Playa" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+            @if (propertyForm.get('title')?.invalid && propertyForm.get('title')?.touched) {
+              <p class="text-red-500 text-xs mt-1">El título es requerido (mínimo 5 caracteres).</p>
+            }
+          </div>
+
+          <!-- Descripción -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Descripción</label>
+            <textarea formControlName="description" rows="4" placeholder="Describe los detalles, ubicación y beneficios..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm resize-y"></textarea>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Precio -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Precio ($) *</label>
+            <input type="number" formControlName="price" placeholder="Ej: 500000" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+          </div>
+
+          <!-- Ubicación -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Ubicación *</label>
+            <input type="text" formControlName="location" placeholder="Ej: Madrid, Centro" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles de la Propiedad -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">Detalles y Categoría</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Tipo -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Tipo de Inmueble *</label>
+            <select formControlName="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm">
+              <option value="Casa">Casa</option>
+              <option value="Apartamento">Apartamento</option>
+              <option value="Villa">Villa</option>
+              <option value="Estudio">Estudio</option>
+              <option value="Local">Local Comercial</option>
+            </select>
+          </div>
+
+          <!-- Estado (Venta/Alquiler) -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Estado *</label>
+            <select formControlName="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm">
+              <option value="Venta">Venta</option>
+              <option value="Alquiler">Alquiler</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Habitaciones -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Habitaciones *</label>
+            <input type="number" formControlName="bedrooms" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+          </div>
+
+          <!-- Baños -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Baños *</label>
+            <input type="number" formControlName="bathrooms" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+          </div>
+
+          <!-- Área -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Área (m²) *</label>
+            <input type="number" formControlName="area" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Imágenes y Configuración -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">Imágenes y Opciones</h2>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">Imágenes de la propiedad {{ !isEditMode() ? '*' : '' }}</label>
+          
+          <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+            <div class="space-y-1 text-center">
+              <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="flex text-sm text-slate-600 justify-center">
+                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                  <span>Sube archivos</span>
+                  <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple accept="image/*" (change)="onFileSelected($event)">
+                </label>
+                <p class="pl-1">o arrastra y suelta</p>
+              </div>
+              <p class="text-xs text-slate-500">PNG, JPG hasta 10MB (Selecciona múltiples)</p>
+            </div>
+          </div>
+
+          <!-- Previsualización de Imágenes Nuevas -->
+          @if(imagePreviews().length > 0) {
+            <div class="mt-6">
+              <p class="text-sm font-bold text-slate-700 mb-3">Imágenes Seleccionadas (Nuevas)</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                @for(preview of imagePreviews(); track $index) {
+                  <div class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square">
+                    <img [src]="preview" class="w-full h-full object-cover" />
+                    <button type="button" (click)="removeSelectedFile($index)" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity" title="Eliminar imagen">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                }
+              </div>
+              <p class="text-xs text-amber-600 mt-2 font-medium bg-amber-50 p-2 rounded inline-block">Nota: Subir nuevas imágenes reemplazará todas las anteriores.</p>
+            </div>
+          } 
+          <!-- Imágenes Existentes (Solo en Edit si no hay nuevas) -->
+          @else if (isEditMode() && existingImages().length > 0) {
+            <div class="mt-6">
+              <p class="text-sm font-bold text-slate-700 mb-3">Imágenes Actuales</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                @for(img of existingImages(); track $index) {
+                  <div class="relative rounded-lg overflow-hidden border border-slate-200 aspect-square">
+                    <img [src]="'http://localhost:3000' + img.url" class="w-full h-full object-cover" />
+                  </div>
+                }
+              </div>
+              <p class="text-xs text-slate-500 mt-2 font-medium">Sube nuevas fotos arriba si deseas reemplazar estas imágenes.</p>
+            </div>
+          } @else if (isEditMode()) {
+            <p class="text-sm text-slate-500 mt-2 font-medium">Deja esto en blanco si no deseas cambiar las imágenes actuales.</p>
+          }
+        </div>
+
+        <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
+          <input type="checkbox" formControlName="featured" id="featured" class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
+          <label for="featured" class="text-sm font-bold text-slate-700 cursor-pointer">Destacar en la página principal</label>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-4 pb-12">
+        <a routerLink="/admin" class="px-6 py-3 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition-colors">
+          Cancelar
+        </a>
+        <button type="submit" [disabled]="isSaving()" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          @if(isSaving()) {
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            Guardando...
+          } @else {
+            {{ isEditMode() ? 'Actualizar Propiedad' : 'Publicar Propiedad' }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

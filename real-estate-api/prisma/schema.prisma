@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  properties Property[]
+}
+
+model Property {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  price       Float
+  location    String
+  type        String
+  status      String   // "Venta", "Alquiler"
+  bedrooms    Int
+  bathrooms   Int
+  area        Float
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agentId     String
+  agent       User     @relation(fields: [agentId], references: [id])
+  
+  images      Image[]
+}
+
+model Image {
+  id         String   @id @default(uuid())
+  url        String
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}

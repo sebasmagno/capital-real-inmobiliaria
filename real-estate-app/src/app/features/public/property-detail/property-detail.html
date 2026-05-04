@@ -1,0 +1,162 @@
+@if (property(); as p) {
+  <div class="animate-fade-in-up">
+    <!-- Header Image -->
+    <div class="w-full h-[50vh] md:h-[60vh] relative">
+      <img [src]="'http://localhost:3000' + (p.images && p.images.length > 0 ? p.images[0].url : '/uploads/placeholder.jpg')" [alt]="p.title" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+      
+      <div class="absolute bottom-0 left-0 w-full p-8 md:p-12 max-w-7xl mx-auto">
+        <div class="inline-block py-1 px-3 rounded-full bg-primary-600 text-white font-bold text-xs mb-4 uppercase tracking-wider">
+          En {{ p.status }}
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-md">{{ p.title }}</h1>
+        <p class="text-xl text-slate-200 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+          </svg>
+          {{ p.location }}
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Main Details -->
+        <div class="lg:col-span-2 space-y-10">
+          
+          <!-- Key Stats -->
+          <div class="flex flex-wrap gap-6 p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex-1 min-w-[100px]">
+              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Precio</p>
+              <p class="text-3xl font-bold text-primary-600">{{ p.price | currency:'COP':'symbol':'1.0-0' }}<span *ngIf="p.status === 'Alquiler'" class="text-base text-slate-500 font-normal">/mes</span></p>
+            </div>
+            <div class="w-px bg-slate-200 hidden sm:block"></div>
+            <div class="flex-1 min-w-[80px]">
+              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Habs</p>
+              <p class="text-2xl font-bold text-slate-900">{{ p.bedrooms }}</p>
+            </div>
+            <div class="w-px bg-slate-200 hidden sm:block"></div>
+            <div class="flex-1 min-w-[80px]">
+              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Baños</p>
+              <p class="text-2xl font-bold text-slate-900">{{ p.bathrooms }}</p>
+            </div>
+            <div class="w-px bg-slate-200 hidden sm:block"></div>
+            <div class="flex-1 min-w-[80px]">
+              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Área</p>
+              <p class="text-2xl font-bold text-slate-900">{{ p.area }} <span class="text-lg font-medium text-slate-500">m²</span></p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Descripción</h2>
+            <p class="text-slate-600 leading-relaxed text-lg">
+              {{ p.description || 'Sin descripción disponible.' }}
+            </p>
+          </div>
+
+          <!-- Image Gallery -->
+          @if (p.images && p.images.length > 1) {
+            <div>
+              <h2 class="text-2xl font-bold text-slate-900 mb-6">Galería de Fotos</h2>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                @for (img of p.images; track $index) {
+                  <div (click)="openLightbox($index)" class="aspect-square rounded-xl overflow-hidden group cursor-pointer border border-slate-100 shadow-sm relative">
+                    <img [src]="'http://localhost:3000' + img.url" [alt]="p.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <!-- Icono lupa hover -->
+                    <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                      </svg>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <!-- Sidebar / Contact Agent -->
+        <div class="lg:col-span-1">
+          <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 sticky top-24">
+            <h3 class="text-xl font-bold text-slate-900 mb-6">Me interesa esta propiedad</h3>
+            
+            <div class="flex items-center gap-4 mb-8">
+              <div class="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-xl border-2 border-primary-200">
+                {{ p.agent.name.charAt(0) || 'A' }}
+              </div>
+              <div>
+                <p class="font-bold text-slate-900">{{ p.agent.name || 'Agente' }}</p>
+                <p class="text-sm text-slate-500">{{ p.agent.email }}</p>
+              </div>
+            </div>
+
+            <form class="space-y-4">
+              <input type="text" placeholder="Tu Nombre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="email" placeholder="Tu Email" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="tel" placeholder="Tu Teléfono" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <textarea rows="3" placeholder="Hola, me gustaría tener más información sobre esta propiedad..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+              <button type="button" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                Solicitar Información
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  @if (selectedImageIndex() !== null && p.images && p.images[selectedImageIndex()!]) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 p-4 sm:p-8 backdrop-blur-sm animate-fade-in" (click)="closeLightbox()">
+      
+      <!-- Botón cerrar -->
+      <button (click)="closeLightbox()" class="absolute top-6 right-6 text-white hover:text-primary-400 transition-colors p-2 bg-slate-800/50 hover:bg-slate-800 rounded-full z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Botón Anterior -->
+      @if (p.images.length > 1) {
+        <button (click)="prevImage($event)" class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white hover:text-primary-400 transition-colors p-3 bg-slate-800/50 hover:bg-slate-800 rounded-full z-10">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+      }
+
+      <!-- Imagen expandida -->
+      <img [src]="'http://localhost:3000' + p.images[selectedImageIndex()!].url" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in" (click)="$event.stopPropagation()" />
+      
+      <!-- Contador -->
+      @if (p.images.length > 1) {
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white bg-slate-900/70 px-4 py-1.5 rounded-full text-sm font-medium tracking-wide">
+          {{ selectedImageIndex()! + 1 }} / {{ p.images.length }}
+        </div>
+      }
+
+      <!-- Botón Siguiente -->
+      @if (p.images.length > 1) {
+        <button (click)="nextImage($event)" class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white hover:text-primary-400 transition-colors p-3 bg-slate-800/50 hover:bg-slate-800 rounded-full z-10">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      }
+    </div>
+  }
+} @else {
+  <div class="min-h-[60vh] flex flex-col items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-slate-300 mb-4 animate-pulse">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+    </svg>
+    <h2 class="text-2xl font-bold text-slate-900 mb-2">Propiedad no encontrada</h2>
+    <p class="text-slate-500 mb-6">La propiedad que buscas no existe o ha sido eliminada.</p>
+    <a routerLink="/propiedades" class="text-primary-600 font-bold hover:underline">Volver al listado</a>
+  </div>
+}
+
+
