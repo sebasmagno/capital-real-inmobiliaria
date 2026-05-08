@@ -100,6 +100,40 @@ export class PropertyDetail {
     }, 800);
   }
 
+  contactViaWhatsApp() {
+    if (this.contactForm.invalid) {
+      this.toastService.error('Por favor, completa tus datos para enviar el WhatsApp.');
+      this.contactForm.markAllAsTouched();
+      return;
+    }
+
+    const formData = this.contactForm.value;
+    const p = this.property();
+    const companyPhone = this.configService.settings().contactPhone;
+
+    if (!p) return;
+
+    // Limpiamos el teléfono (quitamos espacios, guiones, etc)
+    const cleanPhone = companyPhone.replace(/\D/g, '');
+    
+    const message = encodeURIComponent(
+      `Hola, mi nombre es ${formData.name}.\n` +
+      `Me interesa la propiedad: *${p.title}*\n` +
+      `Ubicación: ${p.location}\n` +
+      `Mensaje: ${formData.message}\n` +
+      `Mis datos:\n` +
+      `- Email: ${formData.email}\n` +
+      `- Teléfono: ${formData.phone}`
+    );
+
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+
+    // Abrimos WhatsApp en una nueva pestaña
+    window.open(whatsappUrl, '_blank');
+    
+    this.toastService.success('Abriendo WhatsApp...');
+  }
+
   openLightbox(index: number) {
     this.selectedImageIndex.set(index);
     document.body.style.overflow = 'hidden'; 
