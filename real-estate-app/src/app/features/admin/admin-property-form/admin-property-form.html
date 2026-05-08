@@ -82,7 +82,7 @@
                     <svg viewBox="0 0 24 24" 
                       class="w-full h-full fill-current transition-transform group-hover:scale-110"
                       [ngClass]="propertyForm.get('type')?.value === type.id ? 'text-primary-400' : 'text-slate-300 group-hover:text-primary-500'">
-                      <g [innerHTML]="type.icon"></g>
+                      <g [innerHTML]="getSafeIcon(type.icon)"></g>
                     </svg>
                   </div>
                   
@@ -117,7 +117,7 @@
                     <svg viewBox="0 0 24 24" 
                       class="w-full h-full fill-current"
                       [ngClass]="propertyForm.get('status')?.value === status.id ? 'text-primary-400' : 'text-slate-300 group-hover:text-primary-500'">
-                      <g [innerHTML]="status.icon"></g>
+                      <g [innerHTML]="getSafeIcon(status.icon)"></g>
                     </svg>
                   </div>
                   

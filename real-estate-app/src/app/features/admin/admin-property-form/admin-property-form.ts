@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PropertyService } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
@@ -19,6 +20,7 @@ export class AdminPropertyForm implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private sanitizer = inject(DomSanitizer);
 
   propertyForm: FormGroup;
   isEditMode = signal(false);
@@ -63,6 +65,10 @@ export class AdminPropertyForm implements OnInit {
 
   selectStatus(statusId: string) {
     this.propertyForm.get('status')?.setValue(statusId);
+  }
+
+  getSafeIcon(icon: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(icon);
   }
 
   constructor() {

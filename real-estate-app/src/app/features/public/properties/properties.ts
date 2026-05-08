@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -16,6 +17,11 @@ import { SkeletonProperty } from '../../../shared/components/skeleton-property/s
 export class Properties implements OnInit {
   private propertyService = inject(PropertyService);
   private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+
+  getSafeIcon(icon: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(icon);
+  }
 
   // Filter state
   locationFilter = signal('');

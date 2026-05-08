@@ -46,10 +46,10 @@
                     ? 'bg-slate-900 text-white border-slate-900 shadow-lg ring-1 ring-slate-900' 
                     : 'bg-white text-slate-500 border-slate-100 hover:border-slate-200 hover:bg-slate-50 shadow-sm'">
                   
-                  <svg [innerHTML]="type.icon" 
-                    viewBox="0 0 24 24" 
+                  <svg viewBox="0 0 24 24" 
                     class="w-6 h-6 fill-current transition-transform group-hover:scale-110"
                     [ngClass]="typeFilter() === type.id ? 'text-primary-400' : 'text-slate-300 group-hover:text-slate-400'">
+                    <g [innerHTML]="getSafeIcon(type.icon)"></g>
                   </svg>
                   
                   <span class="uppercase tracking-tight">{{ type.label }}</span>
