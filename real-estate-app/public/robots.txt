@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# No indexar el panel administrativo ni el login
+Disallow: /admin/
+Disallow: /login
+
+# Ruta al mapa del sitio
+Sitemap: https://capital-real-inmobiliaria.vercel.app/sitemap.xml
