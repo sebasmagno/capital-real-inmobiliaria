@@ -147,7 +147,7 @@
           @for (property of stats()?.recentProperties; track property.id) {
             <div (click)="navigateTo('/admin/properties/edit/' + property.id)" class="flex gap-4 p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 hover:border-slate-200 transition-all group cursor-pointer shadow-sm">
               <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-inner bg-slate-100">
-                <img [src]="(property.images && property.images.length > 0 && property.images[0].url.startsWith('http')) ? property.images[0].url : apiUrl + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <img [src]="(property.images && property.images.length > 0 && property.images[0].url.startsWith('http')) ? property.images[0].url : apiUrl.replace('/api', '') + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               </div>
               <div class="min-w-0 flex flex-col justify-center">
                 <p class="text-sm font-bold text-slate-900 truncate group-hover:text-primary-600 transition-colors">{{ property.title }}</p>

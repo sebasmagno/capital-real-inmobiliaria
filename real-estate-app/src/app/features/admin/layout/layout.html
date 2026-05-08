@@ -6,7 +6,7 @@
     <div class="py-6 flex flex-col items-center border-b border-slate-800 gap-3 px-4">
       <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-xl overflow-hidden p-1">
         @if (configService.settings().logoUrl; as logo) {
-          <img [src]="logo.startsWith('http') ? logo : apiUrl + logo" class="w-full h-full object-contain" />
+          <img [src]="logo.startsWith('http') ? logo : apiUrl.replace('/api', '') + logo" class="w-full h-full object-contain" />
         } @else {
           <span class="text-primary-600 font-black text-2xl">{{ configService.settings().companyName.charAt(0) }}</span>
         }
@@ -79,7 +79,7 @@
           </div>
           <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200 bg-slate-100 flex items-center justify-center">
             @if (authService.currentUser()?.imageUrl; as img) {
-              <img [src]="img.startsWith('http') ? img : apiUrl + img" class="w-full h-full object-cover" />
+              <img [src]="img.startsWith('http') ? img : apiUrl.replace('/api', '') + img" class="w-full h-full object-cover" />
             } @else {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />

@@ -154,7 +154,7 @@
               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 @for(img of existingImages(); track $index) {
                   <div class="relative rounded-lg overflow-hidden border border-slate-200 aspect-square">
-                    <img [src]="img.url.startsWith('http') ? img.url : apiUrl + img.url" class="w-full h-full object-cover" />
+                    <img [src]="img.url.startsWith('http') ? img.url : apiUrl.replace('/api', '') + img.url" class="w-full h-full object-cover" />
                   </div>
                 }
               </div>

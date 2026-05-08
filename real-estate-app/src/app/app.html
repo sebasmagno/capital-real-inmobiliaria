@@ -7,7 +7,7 @@
         <div class="flex items-center gap-3">
           @if (configService.settings().logoUrl; as logo) {
             <div class="w-10 h-10 overflow-hidden">
-              <img [src]="logo.startsWith('http') ? logo : apiUrl + logo" [alt]="configService.settings().companyName" class="w-full h-full object-contain" />
+              <img [src]="logo.startsWith('http') ? logo : apiUrl.replace('/api', '') + logo" [alt]="configService.settings().companyName" class="w-full h-full object-contain" />
             </div>
           }
           <div class="flex flex-col leading-none">
