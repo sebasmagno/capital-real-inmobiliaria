@@ -19,3 +19,12 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     return res.status(401).json({ success: false, error: 'Token inválido o expirado.', code: 'AUTH_INVALID_TOKEN' });
   }
 };
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const user = (req as any).user;
+  
+  if (user && user.role === 'ADMIN') {
+    next();
+  } else {
+    res.status(403).json({ success: false, error: 'Acceso denegado. Se requieren permisos de administrador.' });
+  }
+};

@@ -4,7 +4,7 @@ import { createProperty, deleteProperty, updateProperty } from '../controllers/p
 import { getDashboardStats } from '../controllers/adminController';
 import { getUsers, createUser, deleteUser, getPublicAgents, getUserById, updateUser } from '../controllers/userController';
 import { getSettings, updateSettings } from '../controllers/settingsController';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth, isAdmin } from '../middlewares/authMiddleware';
 import { uploadImages } from '../middlewares/multerMiddleware';
 
 const router = Router();
@@ -24,20 +24,20 @@ router.use(requireAuth);
 // Estadísticas del Dashboard
 router.get('/stats', getDashboardStats);
 
-// Gestión de Usuarios (Agentes)
+// Gestión de Usuarios (Agentes) - Solo Admin puede crear/borrar
 router.get('/users', getUsers);
 router.get('/users/:id', getUserById);
-router.post('/users', uploadImages.single('image'), createUser);
-router.put('/users/:id', uploadImages.single('image'), updateUser);
-router.delete('/users/:id', deleteUser);
+router.post('/users', isAdmin, uploadImages.single('image'), createUser);
+router.put('/users/:id', updateUser); // El propio usuario puede editarse, o el admin
+router.delete('/users/:id', isAdmin, deleteUser);
 
 // Gestión de propiedades
 router.post('/properties', uploadImages.array('images', 10), createProperty);
 router.put('/properties/:id', uploadImages.array('images', 10), updateProperty);
-router.delete('/properties/:id', deleteProperty);
+router.delete('/properties/:id', isAdmin, deleteProperty);
 
-// Configuración de la empresa
+// Configuración de la empresa - Solo Admin
 router.get('/settings', getSettings);
-router.put('/settings', uploadImages.single('logo'), updateSettings);
+router.put('/settings', isAdmin, uploadImages.single('logo'), updateSettings);
 
 export default router;
