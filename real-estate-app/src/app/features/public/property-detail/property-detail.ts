@@ -109,7 +109,7 @@ export class PropertyDetail {
 
     const formData = this.contactForm.value;
     const p = this.property();
-    const companyPhone = this.configService.settings().contactPhone;
+    const companyPhone = this.configService.settings().phone;
 
     if (!p) return;
 
