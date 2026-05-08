@@ -28,7 +28,7 @@ router.get('/stats', getDashboardStats);
 router.get('/users', getUsers);
 router.get('/users/:id', getUserById);
 router.post('/users', isAdmin, uploadImages.single('image'), createUser);
-router.put('/users/:id', updateUser); // El propio usuario puede editarse, o el admin
+router.put('/users/:id', uploadImages.single('image'), updateUser); // El propio usuario puede editarse, o el admin
 router.delete('/users/:id', isAdmin, deleteUser);
 
 // Gestión de propiedades
