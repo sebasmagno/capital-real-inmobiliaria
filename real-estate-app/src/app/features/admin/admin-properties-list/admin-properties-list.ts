@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-admin-properties-list',
@@ -14,6 +15,7 @@ import { environment } from '../../../../environments/environment';
 export class AdminPropertiesList implements OnInit {
   private propertyService = inject(PropertyService);
   private toastService = inject(ToastService);
+  public authService = inject(AuthService);
   
   properties = signal<Property[]>([]);
   isLoading = signal(true);

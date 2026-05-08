@@ -22,7 +22,7 @@ export class AdminAgentForm implements OnInit {
   name = signal('');
   email = signal('');
   password = signal('');
-  role = signal('ADMIN');
+  role = signal('AGENT');
   type = signal('Agente');
   phone = signal('');
   bio = signal('');
