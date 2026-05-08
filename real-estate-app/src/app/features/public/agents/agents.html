@@ -20,9 +20,11 @@
             <!-- Image Area -->
             <div class="relative h-80 overflow-hidden bg-slate-100 flex items-center justify-center">
               <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity"></div>
-              <img *ngIf="agent.imageUrl" [src]="agent.imageUrl?.startsWith('http') ? agent.imageUrl : apiUrl + agent.imageUrl" [alt]="agent.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              
-              <svg *ngIf="!agent.imageUrl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-24 h-24 text-slate-300 relative z-20"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+              @if (agent.imageUrl; as img) {
+                <img [src]="img.startsWith('http') ? img : apiUrl + img" [alt]="agent.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-24 h-24 text-slate-300 relative z-20"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+              }
               
               <div class="absolute bottom-6 left-6 z-20">
                 <span class="bg-primary-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
