@@ -6,7 +6,7 @@
     <div class="py-6 flex flex-col items-center border-b border-slate-800 gap-3 px-4">
       <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-xl overflow-hidden p-1">
         @if (configService.settings().logoUrl) {
-          <img [src]="apiUrl + configService.settings().logoUrl" class="w-full h-full object-contain" />
+          <img [src]="configService.settings().logoUrl?.startsWith('http') ? configService.settings().logoUrl : apiUrl + configService.settings().logoUrl" class="w-full h-full object-contain" />
         } @else {
           <span class="text-primary-600 font-black text-2xl">{{ configService.settings().companyName.charAt(0) }}</span>
         }
@@ -78,7 +78,7 @@
             <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-wider font-medium">{{ authService.currentUser()?.role || 'Admin' }}</p>
           </div>
           <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200 bg-slate-100 flex items-center justify-center">
-            <img *ngIf="authService.currentUser()?.imageUrl; else userIcon" [src]="apiUrl + authService.currentUser().imageUrl" class="w-full h-full object-cover" />
+            <img *ngIf="authService.currentUser()?.imageUrl; else userIcon" [src]="authService.currentUser().imageUrl.startsWith('http') ? authService.currentUser().imageUrl : apiUrl + authService.currentUser().imageUrl" class="w-full h-full object-cover" />
             <ng-template #userIcon>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
