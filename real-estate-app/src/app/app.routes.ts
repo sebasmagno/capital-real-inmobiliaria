@@ -8,6 +8,10 @@ import { Login } from './features/admin/login/login';
 import { Layout } from './features/admin/layout/layout';
 import { AdminPropertiesList } from './features/admin/admin-properties-list/admin-properties-list';
 import { AdminPropertyForm } from './features/admin/admin-property-form/admin-property-form';
+import { Dashboard } from './features/admin/dashboard/dashboard';
+import { AdminAgentsList } from './features/admin/admin-agents-list/admin-agents-list';
+import { AdminAgentForm } from './features/admin/admin-agent-form/admin-agent-form';
+import { AdminSettings } from './features/admin/admin-settings/admin-settings';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -24,11 +28,16 @@ export const routes: Routes = [
     component: Layout,
     canActivate: [authGuard],
     children: [
-      // Al entrar a /admin redirige directamente al listado de propiedades
-      { path: '', redirectTo: 'properties', pathMatch: 'full' },
+      // Al entrar a /admin redirige directamente al dashboard
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: Dashboard },
       { path: 'properties', component: AdminPropertiesList },
       { path: 'properties/new', component: AdminPropertyForm },
-      { path: 'properties/edit/:id', component: AdminPropertyForm }
+      { path: 'properties/edit/:id', component: AdminPropertyForm },
+      { path: 'agents', component: AdminAgentsList },
+      { path: 'agents/new', component: AdminAgentForm },
+      { path: 'agents/edit/:id', component: AdminAgentForm },
+      { path: 'settings', component: AdminSettings }
     ]
   },
   

@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   isLoggedIn = signal(!!localStorage.getItem('token'));
+  currentUser = signal<any>(JSON.parse(localStorage.getItem('user') || 'null'));
   
   private router = inject(Router);
   private http = inject(HttpClient);
@@ -19,8 +20,10 @@ export class AuthService {
           next: (res) => {
             if (res.success && res.data.token) {
               localStorage.setItem('token', res.data.token);
+              localStorage.setItem('user', JSON.stringify(res.data.user));
               this.isLoggedIn.set(true);
-              this.router.navigate(['/admin/properties']);
+              this.currentUser.set(res.data.user);
+              this.router.navigate(['/admin/dashboard']);
               resolve(true);
             } else {
               reject('Error en respuesta');
@@ -36,7 +39,9 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.isLoggedIn.set(false);
+    this.currentUser.set(null);
     this.router.navigate(['/']);
   }
 }

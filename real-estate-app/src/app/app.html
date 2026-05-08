@@ -3,10 +3,13 @@
   @if (showPublicUI()) {
     <header class="w-full bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+          <div *ngIf="configService.settings().logoUrl" class="w-10 h-10 overflow-hidden">
+            <img [src]="apiUrl + configService.settings().logoUrl" [alt]="configService.settings().companyName" class="w-full h-full object-contain" />
+          </div>
           <div class="flex flex-col leading-none">
-            <span class="font-bold text-xl tracking-tight text-primary-800">CAPITAL REAL</span>
-            <span class="text-[10px] font-bold tracking-[0.2em] text-accent-500 uppercase">Inmobiliaria</span>
+            <span class="font-bold text-xl tracking-tight text-primary-800">{{ configService.settings().companyName }}</span>
+            <span *ngIf="!configService.settings().logoUrl" class="text-[10px] font-bold tracking-[0.2em] text-accent-500 uppercase">Inmobiliaria</span>
           </div>
         </div>
         <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
@@ -42,11 +45,61 @@
     <footer class="bg-slate-900 text-slate-400 py-12 mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="flex flex-col leading-none text-white">
-          <span class="font-bold text-lg tracking-tight">CAPITAL REAL</span>
+          <span class="font-bold text-lg tracking-tight">{{ configService.settings().companyName }}</span>
           <span class="text-[9px] font-bold tracking-[0.2em] text-accent-400 uppercase">Inmobiliaria</span>
         </div>
-        <p class="text-sm">© 2026 CAPITAL REAL INMOBILIARIA. Confianza, Respaldo, Integridad.</p>
+        <div class="flex flex-col items-center gap-2">
+          <p class="text-sm">© {{ currentYear }} {{ configService.settings().companyName }}. Confianza, Respaldo, Integridad.</p>
+          <div class="flex flex-wrap justify-center gap-4 text-xs">
+            <span *ngIf="configService.settings().phone">📞 {{ configService.settings().phone }}</span>
+            <span *ngIf="configService.settings().contactEmail">✉️ {{ configService.settings().contactEmail }}</span>
+            <span *ngIf="configService.settings().address">📍 {{ configService.settings().address }}</span>
+          </div>
+        </div>
       </div>
     </footer>
   }
+  
+  <!-- Global Toasts (Direct Integration) -->
+  <div style="position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; width: 100%; max-width: 380px;">
+    @for (toast of toastService.toasts(); track toast.id) {
+      <div 
+        style="pointer-events: auto; width: 100%; padding: 16px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 2px solid; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: white; animation: slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"
+        [style.border-color]="toast.type === 'success' ? '#10b981' : (toast.type === 'error' ? '#ef4444' : (toast.type === 'warning' ? '#f59e0b' : '#3b82f6'))"
+      >
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div 
+            style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;"
+            [style.background-color]="toast.type === 'success' ? '#10b981' : (toast.type === 'error' ? '#ef4444' : (toast.type === 'warning' ? '#f59e0b' : '#3b82f6'))"
+          >
+            @if (toast.type === 'success') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width: 24px; height: 24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+            } @else if (toast.type === 'error') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width: 24px; height: 24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            } @else if (toast.type === 'warning') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width: 24px; height: 24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width: 24px; height: 24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+            }
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 800; font-size: 14px; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">
+              {{ toast.type === 'success' ? 'Éxito' : (toast.type === 'error' ? 'Error' : (toast.type === 'warning' ? 'Aviso' : 'Info')) }}
+            </span>
+            <span style="font-size: 14px; color: #64748b; font-weight: 500;">{{ toast.message }}</span>
+          </div>
+        </div>
+        <button (click)="toastService.remove(toast.id)" style="cursor: pointer; background: none; border: none; padding: 8px; color: #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+    }
+  </div>
 </div>
+
+<style>
+  @keyframes slide-in {
+    from { transform: translateX(100%) scale(0.9); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
+  }
+</style>

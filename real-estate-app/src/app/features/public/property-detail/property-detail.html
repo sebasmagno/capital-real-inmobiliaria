@@ -26,32 +26,38 @@
         <div class="lg:col-span-2 space-y-10">
           
           <!-- Key Stats -->
-          <div class="flex flex-wrap gap-6 p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div class="flex-1 min-w-[100px]">
-              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Precio</p>
-              <p class="text-3xl font-bold text-primary-600">{{ p.price | currency:'COP':'symbol':'1.0-0' }}<span *ngIf="p.status === 'Alquiler'" class="text-base text-slate-500 font-normal">/mes</span></p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <div class="px-4">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Precio</p>
+              <div class="flex flex-col">
+                <p class="text-2xl font-black text-primary-600 leading-none">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</p>
+                <span *ngIf="p.status === 'Alquiler'" class="text-xs text-slate-400 font-bold mt-1">/ MES</span>
+              </div>
             </div>
-            <div class="w-px bg-slate-200 hidden sm:block"></div>
-            <div class="flex-1 min-w-[80px]">
-              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Habs</p>
-              <p class="text-2xl font-bold text-slate-900">{{ p.bedrooms }}</p>
+            
+            <div class="px-4 border-l border-slate-100">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Habs</p>
+              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bedrooms }}</p>
             </div>
-            <div class="w-px bg-slate-200 hidden sm:block"></div>
-            <div class="flex-1 min-w-[80px]">
-              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Baños</p>
-              <p class="text-2xl font-bold text-slate-900">{{ p.bathrooms }}</p>
+            
+            <div class="px-4 border-l border-slate-100">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Baños</p>
+              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bathrooms }}</p>
             </div>
-            <div class="w-px bg-slate-200 hidden sm:block"></div>
-            <div class="flex-1 min-w-[80px]">
-              <p class="text-slate-500 text-sm mb-1 uppercase tracking-wide font-bold">Área</p>
-              <p class="text-2xl font-bold text-slate-900">{{ p.area }} <span class="text-lg font-medium text-slate-500">m²</span></p>
+            
+            <div class="px-4 border-l border-slate-100">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Área</p>
+              <div class="flex items-baseline gap-1">
+                <p class="text-2xl font-black text-slate-900 leading-none">{{ p.area }}</p>
+                <span class="text-xs font-bold text-slate-400">m²</span>
+              </div>
             </div>
           </div>
 
           <!-- Description -->
           <div>
             <h2 class="text-2xl font-bold text-slate-900 mb-4">Descripción</h2>
-            <p class="text-slate-600 leading-relaxed text-lg">
+            <p class="text-slate-600 leading-relaxed text-lg whitespace-pre-line">
               {{ p.description || 'Sin descripción disponible.' }}
             </p>
           </div>
@@ -88,18 +94,32 @@
                 {{ p.agent.name.charAt(0) || 'A' }}
               </div>
               <div>
-                <p class="font-bold text-slate-900">{{ p.agent.name || 'Agente' }}</p>
-                <p class="text-sm text-slate-500">{{ p.agent.email }}</p>
+                <p class="font-bold text-slate-900 leading-tight">{{ p.agent.name || 'Agente' }}</p>
+                <p class="text-xs text-slate-500">{{ configService.settings().contactEmail }}</p>
               </div>
             </div>
 
-            <form class="space-y-4">
-              <input type="text" placeholder="Tu Nombre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-              <input type="email" placeholder="Tu Email" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-              <input type="tel" placeholder="Tu Teléfono" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-              <textarea rows="3" placeholder="Hola, me gustaría tener más información sobre esta propiedad..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
-              <button type="button" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
-                Solicitar Información
+            <form [formGroup]="contactForm" (ngSubmit)="sendInquiry()" class="space-y-4">
+              <div>
+                <input type="text" formControlName="name" placeholder="Tu Nombre" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+              </div>
+              <div>
+                <input type="email" formControlName="email" placeholder="Tu Email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+              </div>
+              <div>
+                <input type="tel" formControlName="phone" placeholder="Tu Teléfono" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+              </div>
+              <div>
+                <textarea rows="4" formControlName="message" placeholder="Mensaje..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none transition-all"></textarea>
+              </div>
+              
+              <button type="submit" [disabled]="isSending() || contactForm.invalid" class="w-full bg-slate-900 hover:bg-primary-700 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+                @if (isSending()) {
+                  <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  <span>Enviando...</span>
+                } @else {
+                  <span>Solicitar Información</span>
+                }
               </button>
             </form>
           </div>
@@ -158,5 +178,3 @@
     <a routerLink="/propiedades" class="text-primary-600 font-bold hover:underline">Volver al listado</a>
   </div>
 }
-
-

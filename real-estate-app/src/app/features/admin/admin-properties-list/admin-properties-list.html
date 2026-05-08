@@ -15,8 +15,12 @@
 
   <!-- Loading State -->
   @if (isLoading()) {
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 flex justify-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-24 flex flex-col items-center justify-center gap-4">
+      <div class="relative">
+        <div class="w-12 h-12 rounded-full border-4 border-slate-100"></div>
+        <div class="w-12 h-12 rounded-full border-4 border-primary-600 border-t-transparent animate-spin absolute top-0 left-0"></div>
+      </div>
+      <p class="text-slate-500 font-medium animate-pulse">Cargando propiedades...</p>
     </div>
   } @else {
     <!-- Properties Table -->

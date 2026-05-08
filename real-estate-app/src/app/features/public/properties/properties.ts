@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { SkeletonProperty } from '../../../shared/components/skeleton-property/skeleton-property';
 
 @Component({
   selector: 'app-properties',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SkeletonProperty],
   templateUrl: './properties.html',
   styleUrl: './properties.css'
 })
@@ -18,6 +20,8 @@ export class Properties implements OnInit {
   locationFilter = signal('');
   typeFilter = signal('Todos');
   priceFilter = signal('Sin Límite');
+  
+  private locationSubject = new Subject<string>();
 
   // Data state
   properties = signal<Property[]>([]);
@@ -30,10 +34,22 @@ export class Properties implements OnInit {
       }
     });
 
+    // Debounce location search
+    this.locationSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      this.locationFilter.set(value);
+    });
+
     effect(() => {
       // Re-fetch when filters change
       this.fetchProperties(this.locationFilter(), this.typeFilter(), this.priceFilter());
     });
+  }
+
+  onLocationChange(value: string) {
+    this.locationSubject.next(value);
   }
 
   ngOnInit() {

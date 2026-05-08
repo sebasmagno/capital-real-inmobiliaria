@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-properties-list',
@@ -11,6 +12,7 @@ import { PropertyService, Property } from '../../../core/services/property';
 })
 export class AdminPropertiesList implements OnInit {
   private propertyService = inject(PropertyService);
+  private toastService = inject(ToastService);
   
   properties = signal<Property[]>([]);
   isLoading = signal(true);
@@ -24,10 +26,12 @@ export class AdminPropertiesList implements OnInit {
     // Para la vista administrativa pedimos todas las propiedades sin filtro por ahora
     this.propertyService.getProperties().subscribe({
       next: (res) => {
-        if (res.success) {
-          this.properties.set(res.data);
-        }
-        this.isLoading.set(false);
+        setTimeout(() => {
+          if (res.success) {
+            this.properties.set(res.data);
+          }
+          this.isLoading.set(false);
+        }, 800);
       },
       error: (err) => {
         console.error('Error cargando propiedades', err);
@@ -41,12 +45,12 @@ export class AdminPropertiesList implements OnInit {
       this.propertyService.deleteProperty(id).subscribe({
         next: (res) => {
           if (res.success) {
-            // Actualizar la lista localmente eliminando la borrada
+            this.toastService.success('Propiedad eliminada correctamente');
             this.properties.update(props => props.filter(p => p.id !== id));
           }
         },
         error: (err) => {
-          alert('Hubo un error al eliminar la propiedad: ' + (err.error?.error || err.message));
+          this.toastService.error('Hubo un error al eliminar la propiedad');
         }
       });
     }

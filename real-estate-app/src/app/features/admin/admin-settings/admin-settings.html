@@ -1,0 +1,96 @@
+<div class="max-w-4xl mx-auto animate-fade-in">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Configuración de la Empresa</h1>
+      <p class="text-slate-500 text-sm">Administra la información pública de tu inmobiliaria.</p>
+    </div>
+    <button (click)="saveSettings()" [disabled]="isSaving() || isLoading()" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-primary-200 disabled:opacity-70 flex items-center gap-3">
+      @if (isSaving()) {
+        <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+        <span>Guardando...</span>
+      } @else {
+        <span>Guardar Cambios</span>
+      }
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-24 flex flex-col items-center justify-center gap-4">
+      <div class="relative">
+        <div class="w-12 h-12 rounded-full border-4 border-slate-100"></div>
+        <div class="w-12 h-12 rounded-full border-4 border-primary-600 border-t-transparent animate-spin absolute top-0 left-0"></div>
+      </div>
+      <p class="text-slate-500 font-medium animate-pulse">Cargando configuración...</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Logo Section -->
+      <div class="md:col-span-1">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
+          <label class="block text-sm font-bold text-slate-700 mb-4 text-left">Logo de la Empresa</label>
+          <div class="relative inline-block group">
+            <div class="w-48 h-48 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden mx-auto flex items-center justify-center p-4">
+              <img *ngIf="logoPreview()" [src]="logoPreview()" class="max-w-full max-h-full object-contain" />
+              <div *ngIf="!logoPreview()" class="text-slate-400 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                <span class="text-xs">PNG, JPG o SVG</span>
+              </div>
+            </div>
+            <button (click)="logoInput.click()" class="absolute -bottom-2 -right-2 p-3 bg-white text-primary-600 rounded-xl shadow-xl hover:bg-primary-50 transition-all border border-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
+            </button>
+            <input type="file" #logoInput (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="md:col-span-2 space-y-6">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <h3 class="text-lg font-bold text-slate-900 mb-6">Información General</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">Nombre de la Inmobiliaria</label>
+              <input type="text" [ngModel]="companyName()" (ngModelChange)="companyName.set($event)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Email de Contacto</label>
+                <input type="email" [ngModel]="contactEmail()" (ngModelChange)="contactEmail.set($event)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Teléfono Público</label>
+                <input type="text" [ngModel]="phone()" (ngModelChange)="phone.set($event)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">Horario de Atención</label>
+              <input type="text" [ngModel]="businessHours()" (ngModelChange)="businessHours.set($event)" placeholder="Ej: Lunes a Viernes, 9am - 6pm" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">Dirección Física</label>
+              <input type="text" [ngModel]="address()" (ngModelChange)="address.set($event)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <h3 class="text-lg font-bold text-slate-900 mb-6">Redes Sociales</h3>
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
+              </div>
+              <input type="text" [ngModel]="facebookUrl()" (ngModelChange)="facebookUrl.set($event)" placeholder="https://facebook.com/..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:outline-none" />
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-pink-50 flex items-center justify-center text-pink-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.917 3.917 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.445.01 10.173 0 8 0zm0 1.44c2.168 0 2.427.01 3.286.048.796.035 1.228.168 1.516.28.382.148.654.32.943.608.288.288.46.56.608.943.112.288.245.72.28 1.516.038.858.048 1.117.048 3.286 0 2.168-.01 2.427-.048 3.286-.035.796-.168 1.228-.28 1.516a2.809 2.809 0 0 1-.608.943 2.809 2.809 0 0 1-.943.608c-.288.112-.72.245-1.516.28-.858.038-1.117.048-3.286.048-2.169 0-2.427-.01-3.286-.048-.796-.035-1.228-.168-1.516-.28a2.809 2.809 0 0 1-.943-.608 2.809 2.809 0 0 1-.608-.943c-.112-.288-.245-.72-.28-1.516-.038-.858-.048-1.117-.048-3.286 0-2.169.01-2.427.048-3.286.035-.796.168-1.228.28-1.516.148-.382.32-.654.608-.943.288-.288.56-.46.943-.608.288-.112.72-.245 1.516-.28.858-.038 1.117-.048 3.286-.048zm0 2.446a4.114 4.114 0 1 0 0 8.228 4.114 4.114 0 0 0 0-8.228zm0 6.788a2.674 2.674 0 1 1 0-5.348 2.674 2.674 0 0 1 0 5.348z"/></svg>
+            </div>
+            <input type="text" [ngModel]="instagramUrl()" (ngModelChange)="instagramUrl.set($event)" placeholder="https://instagram.com/..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:outline-none" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -16,7 +16,7 @@
           </div>
           <div>
             <h3 class="text-lg font-bold text-slate-900 mb-1">Nuestra Oficina</h3>
-            <p class="text-slate-600">Av. Principal 1234, Edificio Empresarial<br>Madrid, España 28001</p>
+            <p class="text-slate-600">{{ configService.settings().address || 'Pereira, Risaralda, Colombia' }}</p>
           </div>
         </div>
 
@@ -28,7 +28,7 @@
           </div>
           <div>
             <h3 class="text-lg font-bold text-slate-900 mb-1">Teléfono</h3>
-            <p class="text-slate-600">+34 900 123 456<br><span class="text-sm text-slate-400">Lunes a Viernes, 9am - 6pm</span></p>
+            <p class="text-slate-600">{{ configService.settings().phone || '+57 300 000 0000' }}<br><span class="text-sm text-slate-400">{{ configService.settings().businessHours || 'Lunes a Viernes, 9am - 6pm' }}</span></p>
           </div>
         </div>
 
@@ -40,7 +40,7 @@
           </div>
           <div>
             <h3 class="text-lg font-bold text-slate-900 mb-1">Email</h3>
-            <p class="text-slate-600">info@capitalreal.com<br>soporte@capitalreal.com</p>
+            <p class="text-slate-600">{{ configService.settings().contactEmail || 'info@capitalreal.com' }}</p>
           </div>
         </div>
       </div>

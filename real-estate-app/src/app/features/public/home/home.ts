@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PropertyService, Property } from '../../../core/services/property';
+import { ConfigService } from '../../../core/services/config';
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ import { PropertyService, Property } from '../../../core/services/property';
 export class Home implements OnInit {
   private router = inject(Router);
   private propertyService = inject(PropertyService);
+  private configService = inject(ConfigService);
   private title = inject(Title);
   private meta = inject(Meta);
   
@@ -32,9 +34,10 @@ export class Home implements OnInit {
   }
 
   private updateSEO() {
-    this.title.setTitle('CAPITAL REAL INMOBILIARIA | Encuentra tu hogar perfecto');
-    this.meta.updateTag({ name: 'description', content: 'Explora las mejores propiedades en venta y alquiler con CAPITAL REAL INMOBILIARIA. Casas, apartamentos y locales exclusivos en las mejores ubicaciones.' });
-    this.meta.updateTag({ property: 'og:title', content: 'CAPITAL REAL INMOBILIARIA - Tu próxima propiedad' });
+    const name = this.configService.settings().companyName;
+    this.title.setTitle(`${name} | Encuentra tu hogar perfecto`);
+    this.meta.updateTag({ name: 'description', content: `Explora las mejores propiedades en venta y alquiler con ${name}. Casas, apartamentos y locales exclusivos en las mejores ubicaciones.` });
+    this.meta.updateTag({ property: 'og:title', content: `${name} - Tu próxima propiedad` });
     this.meta.updateTag({ property: 'og:description', content: 'Busca y encuentra la propiedad ideal para ti con nuestro buscador inteligente.' });
     this.meta.updateTag({ property: 'og:image', content: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9' });
   }
