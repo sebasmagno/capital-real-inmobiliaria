@@ -51,7 +51,7 @@ export class AdminSettings implements OnInit {
             this.twitterUrl.set(s.twitterUrl || '');
             this.businessHours.set(s.businessHours || 'Lunes a Viernes, 9am - 6pm');
             if (s.logoUrl) {
-              const fullLogoUrl = s.logoUrl.startsWith('http') ? s.logoUrl : `${this.apiUrl}${s.logoUrl}`;
+              const fullLogoUrl = s.logoUrl.startsWith('http') ? s.logoUrl : `${this.apiUrl.replace('/api', '')}${s.logoUrl}`;
               this.logoPreview.set(fullLogoUrl);
             }
           }
