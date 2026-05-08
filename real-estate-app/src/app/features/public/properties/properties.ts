@@ -21,6 +21,15 @@ export class Properties implements OnInit {
   locationFilter = signal('');
   typeFilter = signal('Todos');
   priceFilter = signal('Sin Límite');
+
+  propertyTypes = [
+    { id: 'Todos', label: 'Todos', icon: '<path d="M12 2L2 19H22L12 2ZM12 6L19.53 17H4.47L12 6Z" />' },
+    { id: 'Casa', label: 'Casa', icon: '<path d="M12 3L4 9V21H20V9L12 3ZM12 7.7L17 11.5V19H7V11.5L12 7.7Z" />' },
+    { id: 'Apartamento', label: 'Apartamento', icon: '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" />' },
+    { id: 'Villa', label: 'Villa', icon: '<path d="M12 3L4 9V21H20V9L12 3ZM12 7.7C13.4 7.7 14.5 8.8 14.5 10.2C14.5 11.6 13.4 12.7 12 12.7C10.6 12.7 9.5 11.6 9.5 10.2C9.5 8.8 10.6 7.7 12 7.7ZM7 19V11.5L12 7.7L17 11.5V19H7Z" />' },
+    { id: 'Oficina', label: 'Oficina', icon: '<path d="M20 6H4V4H20V6ZM20 8H4V20H20V8ZM14 12H10V10H14V12Z" />' },
+    { id: 'Local', label: 'Local', icon: '<path d="M12 2L2 7V12H22V7L12 2ZM4 14V20H10V14H4ZM14 14V20H20V14H14Z" />' }
+  ];
   
   private locationSubject = new Subject<string>();
 

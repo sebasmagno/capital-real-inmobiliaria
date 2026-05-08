@@ -64,25 +64,69 @@
         <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">Detalles y Categoría</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Tipo -->
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">Tipo de Inmueble *</label>
-            <select formControlName="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm">
-              <option value="Casa">Casa</option>
-              <option value="Apartamento">Apartamento</option>
-              <option value="Villa">Villa</option>
-              <option value="Estudio">Estudio</option>
-              <option value="Local">Local Comercial</option>
-            </select>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-4">¿Cuál es el tipo de inmueble a publicar? *</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              @for (type of propertyTypes; track type.id) {
+                <button type="button" 
+                  (click)="selectType(type.id)"
+                  class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all group relative"
+                  [ngClass]="propertyForm.get('type')?.value === type.id 
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-md ring-2 ring-slate-800 ring-offset-1' 
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'">
+                  
+                  <svg [innerHTML]="type.icon" 
+                    viewBox="0 0 24 24" 
+                    class="w-5 h-5 fill-current"
+                    [ngClass]="propertyForm.get('type')?.value === type.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'">
+                  </svg>
+                  
+                  <span class="truncate">{{ type.label }}</span>
+
+                  @if (propertyForm.get('type')?.value === type.id) {
+                    <div class="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm border border-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2.5 h-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </div>
+                  }
+                </button>
+              }
+            </div>
+            @if (propertyForm.get('type')?.invalid && propertyForm.get('type')?.touched) {
+              <p class="text-red-500 text-xs mt-2">Debes seleccionar un tipo de inmueble.</p>
+            }
           </div>
 
           <!-- Estado (Venta/Alquiler) -->
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">Estado *</label>
-            <select formControlName="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm">
-              <option value="Venta">Venta</option>
-              <option value="Alquiler">Alquiler</option>
-            </select>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-4">¿En qué estado se encuentra el inmueble? *</label>
+            <div class="flex flex-wrap gap-3">
+              @for (status of propertyStatuses; track status.id) {
+                <button type="button" 
+                  (click)="selectStatus(status.id)"
+                  class="flex items-center gap-2 px-6 py-2.5 rounded-xl border text-sm font-medium transition-all group relative"
+                  [ngClass]="propertyForm.get('status')?.value === status.id 
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-md ring-2 ring-slate-800 ring-offset-1' 
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'">
+                  
+                  <svg [innerHTML]="status.icon" 
+                    viewBox="0 0 24 24" 
+                    class="w-5 h-5 fill-current"
+                    [ngClass]="propertyForm.get('status')?.value === status.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'">
+                  </svg>
+                  
+                  <span>{{ status.label }}</span>
+
+                  @if (propertyForm.get('status')?.value === status.id) {
+                    <div class="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm border border-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2.5 h-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </div>
+                  }
+                </button>
+              }
+            </div>
+            @if (propertyForm.get('status')?.invalid && propertyForm.get('status')?.touched) {
+              <p class="text-red-500 text-xs mt-2">Debes seleccionar un estado.</p>
+            }
           </div>
         </div>
 
