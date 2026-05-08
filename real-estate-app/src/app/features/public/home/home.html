@@ -61,7 +61,7 @@
                 Destacado
               </div>
             }
-            <img [src]="(property.images && property.images.length > 0 && property.images[0].url.startsWith('http')) ? property.images[0].url : apiUrl + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" [alt]="property.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+            <img [src]="(property.images && property.images.length > 0 && property.images[0].url?.startsWith('http')) ? property.images[0].url : apiUrl + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" [alt]="property.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
           </div>
           <div class="p-6">
             <h3 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">{{ property.title }}</h3>

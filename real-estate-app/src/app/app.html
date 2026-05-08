@@ -5,7 +5,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div *ngIf="configService.settings().logoUrl" class="w-10 h-10 overflow-hidden">
-            <img [src]="configService.settings().logoUrl.startsWith('http') ? configService.settings().logoUrl : apiUrl + configService.settings().logoUrl" [alt]="configService.settings().companyName" class="w-full h-full object-contain" />
+            <img [src]="configService.settings().logoUrl?.startsWith('http') ? configService.settings().logoUrl : apiUrl + configService.settings().logoUrl" [alt]="configService.settings().companyName" class="w-full h-full object-contain" />
           </div>
           <div class="flex flex-col leading-none">
             <span class="font-bold text-xl tracking-tight text-primary-800">{{ configService.settings().companyName }}</span>
