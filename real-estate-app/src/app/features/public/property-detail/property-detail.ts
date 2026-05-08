@@ -101,13 +101,6 @@ export class PropertyDetail {
   }
 
   contactViaWhatsApp() {
-    if (this.contactForm.invalid) {
-      this.toastService.error('Por favor, completa tus datos para enviar el WhatsApp.');
-      this.contactForm.markAllAsTouched();
-      return;
-    }
-
-    const formData = this.contactForm.value;
     const p = this.property();
     const companyPhone = this.configService.settings().phone;
 
@@ -116,15 +109,28 @@ export class PropertyDetail {
     // Limpiamos el teléfono (quitamos espacios, guiones, etc)
     const cleanPhone = companyPhone.replace(/\D/g, '');
     
-    const message = encodeURIComponent(
-      `Hola, mi nombre es ${formData.name}.\n` +
-      `Me interesa la propiedad: *${p.title}*\n` +
-      `Ubicación: ${p.location}\n` +
-      `Mensaje: ${formData.message}\n` +
-      `Mis datos:\n` +
-      `- Email: ${formData.email}\n` +
-      `- Teléfono: ${formData.phone}`
-    );
+    let message = '';
+    const formData = this.contactForm.value;
+
+    // Si el formulario es válido, enviamos mensaje completo. 
+    // Si no, enviamos uno genérico para no bloquear al usuario.
+    if (this.contactForm.valid) {
+      message = encodeURIComponent(
+        `Hola, mi nombre es ${formData.name}.\n` +
+        `Me interesa la propiedad: *${p.title}*\n` +
+        `Ubicación: ${p.location}\n` +
+        `Mensaje: ${formData.message}\n` +
+        `Mis datos:\n` +
+        `- Email: ${formData.email}\n` +
+        `- Teléfono: ${formData.phone}`
+      );
+    } else {
+      message = encodeURIComponent(
+        `Hola, me interesa la propiedad: *${p.title}*\n` +
+        `Ubicación: ${p.location}\n\n` +
+        `Me gustaría recibir más información.`
+      );
+    }
 
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
 
