@@ -1,25 +1,10 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 
-// Asegurar que el directorio de subidas exista en desarrollo
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configuración de almacenamiento local
-// En un entorno de producción (ej. process.env.NODE_ENV === 'production'), 
-// aquí se usaría multer-s3 o cloudinary-storage.
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `property-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
+/**
+ * Usamos MemoryStorage para que el archivo esté disponible en buffer
+ * Esto permite subirlo directamente a Supabase Storage sin guardarlo localmente.
+ */
+const storage = multer.memoryStorage();
 
 // Filtro para aceptar solo imágenes
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

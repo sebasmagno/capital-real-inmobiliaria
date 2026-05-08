@@ -13,6 +13,10 @@ model User {
   password  String
   name      String
   role      String   @default("ADMIN")
+  type      String   @default("Agente") // "Agente", "Administrativo", "Ambos"
+  imageUrl  String?
+  phone     String?
+  bio       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -46,4 +50,18 @@ model Image {
   propertyId String
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+}
+
+model Settings {
+  id           String   @id @default("singleton")
+  companyName  String   @default("CAPITAL REAL INMOBILIARIA")
+  contactEmail String   @default("info@capitalreal.com")
+  phone        String   @default("+57 300 000 0000")
+  address      String   @default("Pereira, Risaralda, Colombia")
+  logoUrl      String?
+  facebookUrl  String?
+  instagramUrl String?
+  twitterUrl   String?
+  businessHours String   @default("Lunes a Viernes, 9am - 6pm")
+  updatedAt    DateTime @updatedAt
 }

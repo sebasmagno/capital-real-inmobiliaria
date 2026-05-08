@@ -2,7 +2,7 @@
   <div class="animate-fade-in-up">
     <!-- Header Image -->
     <div class="w-full h-[50vh] md:h-[60vh] relative">
-      <img [src]="'http://localhost:3000' + (p.images && p.images.length > 0 ? p.images[0].url : '/uploads/placeholder.jpg')" [alt]="p.title" class="w-full h-full object-cover" />
+      <img [src]="p.images && p.images.length > 0 ? (p.images[0].url.startsWith('http') ? p.images[0].url : 'http://localhost:3000' + p.images[0].url) : '/uploads/placeholder.jpg'" [alt]="p.title" class="w-full h-full object-cover" />
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
       
       <div class="absolute bottom-0 left-0 w-full p-8 md:p-12 max-w-7xl mx-auto">
@@ -69,7 +69,7 @@
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 @for (img of p.images; track $index) {
                   <div (click)="openLightbox($index)" class="aspect-square rounded-xl overflow-hidden group cursor-pointer border border-slate-100 shadow-sm relative">
-                    <img [src]="'http://localhost:3000' + img.url" [alt]="p.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img [src]="img.url.startsWith('http') ? img.url : 'http://localhost:3000' + img.url" [alt]="p.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <!-- Icono lupa hover -->
                     <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-white">
@@ -149,7 +149,7 @@
       }
 
       <!-- Imagen expandida -->
-      <img [src]="'http://localhost:3000' + p.images[selectedImageIndex()!].url" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in" (click)="$event.stopPropagation()" />
+      <img [src]="p.images[selectedImageIndex()!].url.startsWith('http') ? p.images[selectedImageIndex()!].url : 'http://localhost:3000' + p.images[selectedImageIndex()!].url" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in" (click)="$event.stopPropagation()" />
       
       <!-- Contador -->
       @if (p.images.length > 1) {
