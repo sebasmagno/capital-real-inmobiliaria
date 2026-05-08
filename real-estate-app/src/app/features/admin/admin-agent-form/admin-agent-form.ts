@@ -54,7 +54,7 @@ export class AdminAgentForm implements OnInit {
           this.phone.set(user.phone || '');
           this.bio.set(user.bio || '');
           if (user.imageUrl) {
-            const fullImageUrl = user.imageUrl.startsWith('http') ? user.imageUrl : `${this.apiUrl}${user.imageUrl}`;
+            const fullImageUrl = user.imageUrl.startsWith('http') ? user.imageUrl : `${this.apiUrl.replace('/api', '')}${user.imageUrl}`;
             this.imagePreview.set(fullImageUrl);
           }
         }
