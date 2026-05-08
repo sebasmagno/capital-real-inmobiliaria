@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AdminService, User } from '../../../core/services/admin';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 import { SkeletonAgent } from '../../../shared/components/skeleton-agent/skeleton-agent';
 
@@ -16,7 +17,7 @@ export class Agents implements OnInit {
   
   agents = signal<User[]>([]);
   isLoading = signal(true);
-  apiUrl = 'http://localhost:3000';
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.adminService.getPublicAgents().subscribe({

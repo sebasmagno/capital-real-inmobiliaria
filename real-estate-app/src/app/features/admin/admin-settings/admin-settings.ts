@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin';
 import { ConfigService } from '../../../core/services/config';
 import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-settings',
@@ -29,7 +30,7 @@ export class AdminSettings implements OnInit {
   logoPreview = signal<string | null>(null);
   isSaving = signal(false);
   isLoading = signal(true);
-  apiUrl = 'http://localhost:3000';
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.loadSettings();
@@ -50,7 +51,8 @@ export class AdminSettings implements OnInit {
             this.twitterUrl.set(s.twitterUrl || '');
             this.businessHours.set(s.businessHours || 'Lunes a Viernes, 9am - 6pm');
             if (s.logoUrl) {
-              this.logoPreview.set(this.apiUrl + s.logoUrl);
+              const fullLogoUrl = s.logoUrl.startsWith('http') ? s.logoUrl : `${this.apiUrl}${s.logoUrl}`;
+              this.logoPreview.set(fullLogoUrl);
             }
           }
           this.isLoading.set(false);

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { SkeletonProperty } from '../../../shared/components/skeleton-property/skeleton-property';
 
 @Component({
@@ -26,6 +27,7 @@ export class Properties implements OnInit {
   // Data state
   properties = signal<Property[]>([]);
   isLoading = signal(false);
+  apiUrl = environment.apiUrl;
 
   constructor() {
     this.route.queryParams.subscribe(params => {

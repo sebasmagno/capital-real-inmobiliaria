@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { ConfigService } from '../../../core/services/config';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-layout',
@@ -13,7 +14,7 @@ import { ConfigService } from '../../../core/services/config';
 export class Layout implements OnInit {
   public authService = inject(AuthService);
   public configService = inject(ConfigService);
-  apiUrl = 'http://localhost:3000';
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.configService.loadSettings();

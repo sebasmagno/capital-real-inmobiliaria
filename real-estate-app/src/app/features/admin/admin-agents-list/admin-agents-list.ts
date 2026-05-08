@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdminService, User } from '../../../core/services/admin';
 import { ToastService } from '../../../core/services/toast.service';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-agents-list',
@@ -16,7 +17,7 @@ export class AdminAgentsList implements OnInit {
   
   agents = signal<User[]>([]);
   isLoading = signal(true);
-  apiUrl = 'http://localhost:3000';
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.loadAgents();

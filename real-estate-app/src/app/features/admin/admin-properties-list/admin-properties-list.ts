@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PropertyService, Property } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-properties-list',
@@ -16,6 +17,7 @@ export class AdminPropertiesList implements OnInit {
   
   properties = signal<Property[]>([]);
   isLoading = signal(true);
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.loadProperties();

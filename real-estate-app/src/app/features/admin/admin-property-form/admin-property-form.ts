@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PropertyService } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-property-form',
@@ -29,6 +30,7 @@ export class AdminPropertyForm implements OnInit {
   selectedFiles: File[] = [];
   imagePreviews = signal<string[]>([]);
   existingImages = signal<{ url: string }[]>([]);
+  apiUrl = environment.apiUrl;
 
   constructor() {
     this.propertyForm = this.fb.group({

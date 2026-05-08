@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PropertyService, Property } from '../../../core/services/property';
 import { ConfigService } from '../../../core/services/config';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -21,6 +22,7 @@ export class Home implements OnInit {
   
   searchQuery = signal('');
   featuredProperties = signal<Property[]>([]);
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.updateSEO();

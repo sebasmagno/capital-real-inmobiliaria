@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminService } from '../../../core/services/admin';
 import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-agent-form',
@@ -30,6 +31,7 @@ export class AdminAgentForm implements OnInit {
   isSubmitting = signal(false);
   isEditMode = signal(false);
   submitted = signal(false);
+  apiUrl = environment.apiUrl;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -52,7 +54,8 @@ export class AdminAgentForm implements OnInit {
           this.phone.set(user.phone || '');
           this.bio.set(user.bio || '');
           if (user.imageUrl) {
-            this.imagePreview.set(`http://localhost:3000${user.imageUrl}`);
+            const fullImageUrl = user.imageUrl.startsWith('http') ? user.imageUrl : `${this.apiUrl}${user.imageUrl}`;
+            this.imagePreview.set(fullImageUrl);
           }
         }
       },

@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 import { PropertyService, Property } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfigService } from '../../../core/services/config';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-property-detail',
@@ -25,6 +26,7 @@ export class PropertyDetail {
   property = signal<Property | null>(null);
   selectedImageIndex = signal<number | null>(null);
   isSending = signal(false);
+  apiUrl = environment.apiUrl;
 
   contactForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],

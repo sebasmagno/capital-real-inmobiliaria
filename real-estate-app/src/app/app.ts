@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { environment } from '../environments/environment';
 import { AuthService } from './core/services/auth';
 import { ConfigService } from './core/services/config';
 import { filter } from 'rxjs/operators';
@@ -20,7 +21,7 @@ export class App {
   private router = inject(Router);
   
   showPublicUI = signal(true);
-  apiUrl = 'http://localhost:3000';
+  apiUrl = environment.apiUrl;
   currentYear = new Date().getFullYear();
 
   constructor() {
