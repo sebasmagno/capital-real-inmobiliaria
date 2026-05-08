@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
+import { StorageService } from '../services/storageService';
 
 export const getSettings = async (req: Request, res: Response) => {
   try {
@@ -45,7 +46,9 @@ export const updateSettings = async (req: Request, res: Response) => {
     };
 
     if (file) {
-      data.logoUrl = `/uploads/${file.filename}`;
+      // Subir a Supabase Storage
+      const logoUrl = await StorageService.uploadFile(file, 'company');
+      data.logoUrl = logoUrl;
     }
 
     const settings = await prisma.settings.upsert({
