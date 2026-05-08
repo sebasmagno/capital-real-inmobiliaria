@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -18,6 +18,8 @@ export class Properties implements OnInit {
   private propertyService = inject(PropertyService);
   private route = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
 
   getSafeIcon(icon: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(icon);
@@ -79,6 +81,7 @@ export class Properties implements OnInit {
       next: (res) => {
         if (res.success) {
           this.properties.set(res.data);
+          this.updateSEO(location, type);
         }
         this.isLoading.set(false);
       },
@@ -87,6 +90,21 @@ export class Properties implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  private updateSEO(location: string, type: string) {
+    let title = 'Catálogo de Propiedades | CAPITAL REAL';
+    let description = 'Explora nuestro catálogo completo de casas, apartamentos y locales comerciales.';
+
+    if (location || type !== 'Todos') {
+      title = `${type !== 'Todos' ? type : 'Propiedades'} ${location ? 'en ' + location : ''} | CAPITAL REAL`;
+      description = `Encuentra las mejores opciones de ${type.toLowerCase()} ${location ? 'en ' + location : ''}. Resultados actualizados y exclusivos.`;
+    }
+
+    this.titleService.setTitle(title);
+    this.metaService.updateTag({ name: 'description', content: description });
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({ property: 'og:description', content: description });
   }
 
   resetFilters() {

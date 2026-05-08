@@ -2,6 +2,7 @@ import { Component, inject, signal, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Title, Meta } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfigService } from '../../../core/services/config';
@@ -19,6 +20,8 @@ export class PropertyDetail {
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   public configService = inject(ConfigService);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
   
   // Recibimos el ID directamente del Router mediante un input de señal
   id = input.required<string>();
@@ -48,10 +51,27 @@ export class PropertyDetail {
       next: (res) => {
         if (res.success) {
           this.property.set(res.data);
+          this.updateSEO(res.data);
         }
       },
       error: (err) => console.error('Error cargando propiedad', err)
     });
+  }
+
+  private updateSEO(p: Property) {
+    const title = `${p.title} en ${p.location} | CAPITAL REAL`;
+    const description = `${p.type} en ${p.status} con ${p.bedrooms} habitaciones y ${p.bathrooms} baños. Precio: ${p.price}.`;
+    
+    this.titleService.setTitle(title);
+    this.metaService.updateTag({ name: 'description', content: description });
+    
+    // Open Graph
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({ property: 'og:description', content: description });
+    if (p.images && p.images.length > 0) {
+      const imageUrl = p.images[0].url.startsWith('http') ? p.images[0].url : this.apiUrl.replace('/api', '') + p.images[0].url;
+      this.metaService.updateTag({ property: 'og:image', content: imageUrl });
+    }
   }
 
   sendInquiry() {
