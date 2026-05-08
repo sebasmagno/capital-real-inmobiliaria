@@ -12,8 +12,8 @@ import { AuthService } from '../../../core/services/auth';
 export class Login {
   private authService = inject(AuthService);
 
-  email = signal('admin@capitalreal.com');
-  password = signal('admin123');
+  email = signal('');
+  password = signal('');
   errorMessage = signal('');
   isLoading = signal(false);
 
