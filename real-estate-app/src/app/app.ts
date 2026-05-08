@@ -21,6 +21,7 @@ export class App {
   private router = inject(Router);
   
   showPublicUI = signal(true);
+  isMenuOpen = signal(false);
   apiUrl = environment.apiUrl;
   currentYear = new Date().getFullYear();
 
@@ -32,6 +33,11 @@ export class App {
     ).subscribe((event: any) => {
       const url = event.urlAfterRedirects;
       this.showPublicUI.set(!url.includes('/admin') && !url.includes('/login'));
+      this.isMenuOpen.set(false); // Close menu on navigation
     });
+  }
+
+  toggleMenu() {
+    this.isMenuOpen.set(!this.isMenuOpen());
   }
 }
