@@ -11,6 +11,7 @@ import { auditLogger } from './middlewares/auditLogger';
 // Routes imports
 import propertyRoutes from './routes/propertyRoutes';
 import adminRoutes from './routes/adminRoutes';
+import leadRoutes from './routes/leadRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Rutas de negocio
 app.use('/api/properties', propertyRoutes); // Públicas
+app.use('/api/leads', leadRoutes);          // Registro público de Leads
 app.use('/api/admin', adminRoutes);         // Protegidas (Requieren JWT)
 
 // Manejador global de errores (Siempre va al final)

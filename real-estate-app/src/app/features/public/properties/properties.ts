@@ -1,22 +1,24 @@
 import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SkeletonProperty } from '../../../shared/components/skeleton-property/skeleton-property';
+import { PropertyMap } from '../../../shared/components/property-map/property-map';
 
 @Component({
   selector: 'app-properties',
-  imports: [CommonModule, FormsModule, RouterLink, SkeletonProperty],
+  imports: [CommonModule, FormsModule, RouterLink, SkeletonProperty, PropertyMap],
   templateUrl: './properties.html',
   styleUrl: './properties.css'
 })
 export class Properties implements OnInit {
   private propertyService = inject(PropertyService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private titleService = inject(Title);
   private metaService = inject(Meta);
@@ -25,10 +27,15 @@ export class Properties implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(icon);
   }
 
-  // Filter state
+  // Filter & View state
   locationFilter = signal('');
   typeFilter = signal('Todos');
+  statusFilter = signal('Todos');
   priceFilter = signal('Sin Límite');
+  bedroomsFilter = signal('Todos');
+  garagesFilter = signal('Todos');
+  stratumFilter = signal('Todos');
+  viewMode = signal<'grid' | 'split' | 'map'>('grid');
 
   propertyTypes = [
     { id: 'Todos', label: 'Todos', icon: '<path d="M12 2L2 19H22L12 2ZM12 6L19.53 17H4.47L12 6Z" />' },
@@ -46,10 +53,17 @@ export class Properties implements OnInit {
   isLoading = signal(false);
   apiUrl = environment.apiUrl;
 
+  navigateToProperty(propertyId: string) {
+    this.router.navigate(['/propiedades', propertyId]);
+  }
+
   constructor() {
     this.route.queryParams.subscribe(params => {
       if (params['location']) {
         this.locationFilter.set(params['location']);
+      }
+      if (params['status']) {
+        this.statusFilter.set(params['status']);
       }
     });
 
@@ -63,7 +77,15 @@ export class Properties implements OnInit {
 
     effect(() => {
       // Re-fetch when filters change
-      this.fetchProperties(this.locationFilter(), this.typeFilter(), this.priceFilter());
+      this.fetchProperties({
+        location: this.locationFilter(),
+        type: this.typeFilter(),
+        status: this.statusFilter(),
+        maxPrice: this.priceFilter(),
+        minBedrooms: this.bedroomsFilter(),
+        minGarages: this.garagesFilter(),
+        stratum: this.stratumFilter()
+      });
     });
   }
 
@@ -75,13 +97,21 @@ export class Properties implements OnInit {
     // Initial fetch triggered by effect, but we can keep ngOnInit for other logic
   }
 
-  fetchProperties(location: string, type: string, maxPrice: string) {
+  fetchProperties(filters: {
+    location: string;
+    type: string;
+    status: string;
+    maxPrice: string;
+    minBedrooms: string;
+    minGarages: string;
+    stratum: string;
+  }) {
     this.isLoading.set(true);
-    this.propertyService.getProperties({ location, type, maxPrice }).subscribe({
+    this.propertyService.getProperties(filters).subscribe({
       next: (res) => {
         if (res.success) {
           this.properties.set(res.data);
-          this.updateSEO(location, type);
+          this.updateSEO(filters.location, filters.type);
         }
         this.isLoading.set(false);
       },
@@ -110,6 +140,10 @@ export class Properties implements OnInit {
   resetFilters() {
     this.locationFilter.set('');
     this.typeFilter.set('Todos');
+    this.statusFilter.set('Todos');
     this.priceFilter.set('Sin Límite');
+    this.bedroomsFilter.set('Todos');
+    this.garagesFilter.set('Todos');
+    this.stratumFilter.set('Todos');
   }
 }

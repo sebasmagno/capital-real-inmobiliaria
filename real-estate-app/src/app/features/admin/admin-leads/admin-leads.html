@@ -1,0 +1,500 @@
+<div class="space-y-6 animate-fade-in-up">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Leads y CRM Comercial</h1>
+      <p class="text-slate-500 text-sm">Gestiona tus prospectos, agenda visitas y haz seguimiento de ventas.</p>
+    </div>
+    <button (click)="loadLeads()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-2 text-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+      Actualizar Bandeja
+    </button>
+  </div>
+
+  <!-- Embudo Comercial / Pipeline Filter Cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <button
+      type="button"
+      (click)="filterByStatus('TODOS')"
+      [class]="selectedStatus() === 'TODOS' ? 'ring-2 ring-slate-900 bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <span class="text-[11px] font-bold uppercase tracking-wider opacity-75">Todos</span>
+      <span class="text-2xl font-black mt-1">{{ summary().TODOS || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('NUEVO')"
+      [class]="selectedStatus() === 'NUEVO' ? 'ring-2 ring-blue-600 bg-blue-600 text-white' : 'bg-white text-slate-700 hover:bg-blue-50/40 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Nuevos</span>
+        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().NUEVO || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('CONTACTADO')"
+      [class]="selectedStatus() === 'CONTACTADO' ? 'ring-2 ring-sky-600 bg-sky-600 text-white' : 'bg-white text-slate-700 hover:bg-sky-50/40 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Contactados</span>
+        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().CONTACTADO || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('VISITA_AGENDADA')"
+      [class]="selectedStatus() === 'VISITA_AGENDADA' ? 'ring-2 ring-purple-600 bg-purple-600 text-white' : 'bg-white text-slate-700 hover:bg-purple-50/40 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Visitas</span>
+        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().VISITA_AGENDADA || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('EN_NEGOCIACION')"
+      [class]="selectedStatus() === 'EN_NEGOCIACION' ? 'ring-2 ring-amber-500 bg-amber-500 text-white' : 'bg-white text-slate-700 hover:bg-amber-50/40 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Negociación</span>
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().EN_NEGOCIACION || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('CERRADO')"
+      [class]="selectedStatus() === 'CERRADO' ? 'ring-2 ring-emerald-600 bg-emerald-600 text-white' : 'bg-white text-slate-700 hover:bg-emerald-50/40 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Cerrados</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().CERRADO || 0 }}</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="filterByStatus('DESCARTADO')"
+      [class]="selectedStatus() === 'DESCARTADO' ? 'ring-2 ring-slate-600 bg-slate-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'"
+      class="p-3.5 rounded-2xl shadow-sm transition-all text-left flex flex-col justify-between"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Descartados</span>
+        <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+      </div>
+      <span class="text-2xl font-black mt-1">{{ summary().DESCARTADO || 0 }}</span>
+    </button>
+  </div>
+
+  <!-- Barra de Búsqueda y Filtros -->
+  <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+    <!-- Buscador -->
+    <div class="relative flex-1">
+      <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onFilterChange()"
+        placeholder="Buscar por cliente, correo, teléfono o propiedad..."
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+      />
+    </div>
+
+    <!-- Filtro por Canal -->
+    <select
+      [(ngModel)]="selectedSource"
+      (change)="onFilterChange()"
+      class="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+    >
+      <option value="TODOS">Todos los canales</option>
+      <option value="WEB_PROPIEDAD">Web Propiedad</option>
+      <option value="WHATSAPP_PROPIEDAD">WhatsApp Propiedad</option>
+      <option value="WEB_CONTACTO">Web Contacto</option>
+      <option value="WHATSAPP_CONTACTO">WhatsApp Contacto</option>
+    </select>
+
+    <!-- Filtro por Agente -->
+    <select
+      [(ngModel)]="selectedAgentId"
+      (change)="onFilterChange()"
+      class="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
+    >
+      <option value="TODOS">Todos los agentes</option>
+      @for (agent of agents(); track agent.id) {
+        <option [value]="agent.id">{{ agent.name }}</option>
+      }
+    </select>
+
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="onFilterChange()"
+        class="bg-slate-900 hover:bg-primary-600 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
+      >
+        Filtrar
+      </button>
+      @if (selectedStatus() !== 'TODOS' || selectedSource() !== 'TODOS' || selectedAgentId() !== 'TODOS' || searchQuery()) {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
+        >
+          Limpiar
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Estado de Carga -->
+  @if (isLoading()) {
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-20 flex flex-col items-center justify-center gap-4">
+      <div class="relative">
+        <div class="w-12 h-12 rounded-full border-4 border-slate-100"></div>
+        <div class="w-12 h-12 rounded-full border-4 border-primary-600 border-t-transparent animate-spin absolute top-0 left-0"></div>
+      </div>
+      <p class="text-slate-500 font-medium animate-pulse">Cargando bandeja de prospectos...</p>
+    </div>
+  } @else {
+    <!-- Tabla de Leads -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-slate-800 text-xs uppercase font-bold tracking-wider border-b border-slate-200">
+            <tr>
+              <th scope="col" class="px-6 py-4">Prospecto</th>
+              <th scope="col" class="px-6 py-4">Inmueble / Consulta</th>
+              <th scope="col" class="px-6 py-4">Canal & Visita</th>
+              <th scope="col" class="px-6 py-4">Asesor</th>
+              <th scope="col" class="px-6 py-4">Estado Comercial</th>
+              <th scope="col" class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (lead of leads(); track lead.id) {
+              <tr class="hover:bg-slate-50/80 transition-colors" [class.bg-blue-50/20]="lead.status === 'NUEVO'">
+                <!-- Prospecto -->
+                <td class="px-6 py-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 font-black flex items-center justify-center shrink-0 uppercase">
+                      {{ lead.name.charAt(0) }}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="font-bold text-slate-900 flex items-center gap-2">
+                        <span>{{ lead.name }}</span>
+                        @if (lead.status === 'NUEVO') {
+                          <span class="inline-block w-2 h-2 rounded-full bg-blue-600" title="Nuevo sin atender"></span>
+                        }
+                      </div>
+                      <div class="text-xs text-slate-500 truncate">{{ lead.email }}</div>
+                      @if (lead.phone) {
+                        <div class="text-xs font-medium text-slate-700 mt-0.5">{{ lead.phone }}</div>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Inmueble / Consulta -->
+                <td class="px-6 py-4 max-w-xs">
+                  @if (lead.property; as prop) {
+                    <div class="flex items-center gap-3">
+                      <img [src]="getPropertyImageUrl(lead)" [alt]="prop.title" class="w-11 h-11 rounded-lg object-cover border border-slate-200 shrink-0" />
+                      <div class="min-w-0">
+                        <a [routerLink]="['/propiedades', prop.id]" target="_blank" class="font-bold text-slate-900 hover:text-primary-600 transition-colors block truncate">
+                          {{ prop.title }}
+                        </a>
+                        <span class="text-xs text-slate-500 block truncate">{{ prop.location }}</span>
+                      </div>
+                    </div>
+                  } @else {
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                      Consulta General
+                    </span>
+                  }
+                  <p class="text-xs text-slate-500 line-clamp-1 mt-1.5 italic" [title]="lead.message">
+                    "{{ lead.message }}"
+                  </p>
+                </td>
+
+                <!-- Canal & Fecha -->
+                <td class="px-6 py-4">
+                  <div class="flex flex-col items-start gap-1.5">
+                    <span
+                      [class]="isWhatsAppSource(lead.source) ? 'bg-green-50 text-green-700 border-green-200' : 'bg-slate-100 text-slate-700 border-slate-200'"
+                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                    >
+                      {{ getSourceLabel(lead.source) }}
+                    </span>
+                    <span class="text-[11px] text-slate-400">
+                      Recibido: {{ lead.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                    @if (lead.preferredDate) {
+                      <span class="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        Visita: {{ lead.preferredDate | date:'dd/MM/yyyy' }}
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Asesor -->
+                <td class="px-6 py-4">
+                  @if (lead.assignedAgent; as agent) {
+                    <span class="text-xs font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">
+                      {{ agent.name }}
+                    </span>
+                  } @else {
+                    <span class="text-xs text-slate-400 italic">Sin asignar</span>
+                  }
+                </td>
+
+                <!-- Estado Comercial -->
+                <td class="px-6 py-4">
+                  <select
+                    [ngModel]="lead.status"
+                    (ngModelChange)="quickStatusChange(lead, $event)"
+                    [class]="getStatusBadgeClass(lead.status)"
+                    class="text-xs font-bold px-3 py-1.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
+                  >
+                    @for (st of statusOptions; track st.value) {
+                      <option [value]="st.value">{{ st.label }}</option>
+                    }
+                  </select>
+                </td>
+
+                <!-- Acciones -->
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    @if (lead.phone) {
+                      <button
+                        type="button"
+                        (click)="openWhatsAppToLead(lead)"
+                        class="p-2 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
+                        title="Responder por WhatsApp"
+                      >
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      (click)="openLeadDrawer(lead)"
+                      class="px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 font-bold text-xs transition-colors"
+                    >
+                      Seguimiento
+                    </button>
+                    <button
+                      type="button"
+                      (click)="deleteLead(lead)"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Eliminar prospecto"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+
+            @if (leads().length === 0) {
+              <tr>
+                <td colspan="6" class="px-6 py-16 text-center">
+                  <div class="max-w-sm mx-auto">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                      </svg>
+                    </div>
+                    <p class="font-bold text-slate-800">No se encontraron prospectos</p>
+                    <p class="text-xs text-slate-500 mt-1">Cuando los clientes soliciten información desde las propiedades o la página de contacto, aparecerán aquí automáticamente.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Slide-over Drawer de Seguimiento CRM -->
+@if (activeLead(); as selected) {
+  <div class="fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-xs animate-fade-in" (click)="closeLeadDrawer()">
+    <div
+      class="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Cabecera del Drawer -->
+      <div>
+        <div class="p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-widest text-primary-600">Expediente Comercial</span>
+            <h2 class="text-xl font-bold text-slate-900">{{ selected.name }}</h2>
+          </div>
+          <button
+            type="button"
+            (click)="closeLeadDrawer()"
+            class="p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <!-- Datos de contacto y acciones rápidas -->
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-500 uppercase">Datos del Cliente</span>
+              <span class="text-xs text-slate-400">{{ selected.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="space-y-1 text-sm">
+              <p class="text-slate-700"><strong class="text-slate-900">Correo:</strong> {{ selected.email }}</p>
+              <p class="text-slate-700"><strong class="text-slate-900">Teléfono:</strong> {{ selected.phone || 'No registrado' }}</p>
+              <p class="text-slate-700"><strong class="text-slate-900">Canal:</strong> {{ getSourceLabel(selected.source) }}</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+              @if (selected.phone) {
+                <button
+                  type="button"
+                  (click)="openWhatsAppToLead(selected)"
+                  class="flex-1 bg-[#25D366] hover:bg-[#128C7E] text-white text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                >
+                  Contactar por WhatsApp
+                </button>
+              }
+              <a
+                [href]="'mailto:' + selected.email"
+                class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-center"
+              >
+                Enviar Correo
+              </a>
+            </div>
+          </div>
+
+          <!-- Propiedad vinculada -->
+          @if (selected.property; as prop) {
+            <div class="p-4 rounded-2xl border border-slate-200 flex items-center gap-4">
+              <img [src]="getPropertyImageUrl(selected)" [alt]="prop.title" class="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-100" />
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-primary-600">Propiedad de Interés</span>
+                <p class="font-bold text-slate-900 truncate">{{ prop.title }}</p>
+                <p class="text-xs text-slate-500 truncate">{{ prop.location }}</p>
+                @if (prop.price) {
+                  <p class="text-xs font-black text-slate-900 mt-1">{{ prop.price | currency:'COP':'symbol':'1.0-0' }}</p>
+                }
+              </div>
+              <a [routerLink]="['/propiedades', prop.id]" target="_blank" class="text-xs font-bold text-primary-600 hover:underline shrink-0">
+                Ver ficha
+              </a>
+            </div>
+          }
+
+          <!-- Mensaje del prospecto -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Mensaje del Cliente</label>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-700 whitespace-pre-line">
+              {{ selected.message }}
+            </div>
+          </div>
+
+          <!-- Formulario de Seguimiento Comercial -->
+          <div class="space-y-4 pt-2 border-t border-slate-200">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Gestión Comercial</h3>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Estado del Embudo</label>
+              <select
+                [(ngModel)]="editStatus"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                @for (st of statusOptions; track st.value) {
+                  <option [value]="st.value">{{ st.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1.5">Agente Responsable</label>
+                <select
+                  [(ngModel)]="editAgentId"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Sin asignar</option>
+                  @for (agent of agents(); track agent.id) {
+                    <option [value]="agent.id">{{ agent.name }}</option>
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1.5">Fecha de Visita</label>
+                <input
+                  type="date"
+                  [(ngModel)]="editPreferredDate"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Bitácora / Notas Internas del Agente</label>
+              <textarea
+                rows="4"
+                [(ngModel)]="editNotes"
+                placeholder="Escribe aquí acuerdos, presupuesto del cliente, observaciones de la llamada o seguimiento de la visita..."
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Drawer -->
+      <div class="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3 sticky bottom-0">
+        <button
+          type="button"
+          (click)="closeLeadDrawer()"
+          class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-100 transition-colors"
+        >
+          Cerrar
+        </button>
+        <button
+          type="button"
+          (click)="saveLeadFollowUp()"
+          [disabled]="isSaving()"
+          class="px-6 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-colors shadow-md disabled:opacity-50"
+        >
+          {{ isSaving() ? 'Guardando...' : 'Guardar Seguimiento' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

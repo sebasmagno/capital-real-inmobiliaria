@@ -4,6 +4,7 @@ import { createProperty, deleteProperty, updateProperty } from '../controllers/p
 import { getDashboardStats } from '../controllers/adminController';
 import { getUsers, createUser, deleteUser, getPublicAgents, getUserById, updateUser } from '../controllers/userController';
 import { getSettings, updateSettings } from '../controllers/settingsController';
+import { getLeads, updateLead, deleteLead } from '../controllers/leadController';
 import { requireAuth, isAdmin } from '../middlewares/authMiddleware';
 import { uploadImages } from '../middlewares/multerMiddleware';
 
@@ -23,6 +24,11 @@ router.use(requireAuth);
 
 // Estadísticas del Dashboard
 router.get('/stats', getDashboardStats);
+
+// Gestión de Leads / CRM
+router.get('/leads', getLeads);
+router.patch('/leads/:id', updateLead);
+router.delete('/leads/:id', deleteLead);
 
 // Gestión de Usuarios (Agentes) - Solo Admin puede crear/borrar
 router.get('/users', getUsers);

@@ -1,26 +1,81 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
 
-// Endpoint Público: Búsqueda veloz de propiedades
+// Helper para parsear números opcionales desde FormData
+const parseOptionalFloat = (val: any): number | null => {
+  if (val === undefined || val === null || val === '' || val === 'null' || val === 'undefined') return null;
+  const parsed = parseFloat(String(val));
+  return isNaN(parsed) ? null : parsed;
+};
+
+const parseOptionalInt = (val: any): number | null => {
+  if (val === undefined || val === null || val === '' || val === 'null' || val === 'undefined') return null;
+  const parsed = parseInt(String(val), 10);
+  return isNaN(parsed) ? null : parsed;
+};
+
+const parseAmenities = (val: any): string[] => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.map(String).filter(Boolean);
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return [];
+    if (trimmed.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+    return trimmed.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+// Endpoint Público: Búsqueda veloz y avanzada de propiedades
 export const getProperties = async (req: Request, res: Response) => {
-  const { location, type, maxPrice } = req.query;
+  const { location, type, status, maxPrice, minBedrooms, minBathrooms, minGarages, stratum } = req.query;
 
   const filters: any = {};
 
   if (location) {
-    filters.location = { contains: String(location), mode: 'insensitive' };
+    filters.OR = [
+      { location: { contains: String(location), mode: 'insensitive' } },
+      { title: { contains: String(location), mode: 'insensitive' } },
+      { code: { contains: String(location), mode: 'insensitive' } }
+    ];
   }
   
   if (type && type !== 'Todos') {
     filters.type = String(type);
   }
 
+  if (status && status !== 'Todos') {
+    filters.status = String(status);
+  }
+
   if (maxPrice && maxPrice !== 'Sin Límite') {
-    // Parse maxPrice from '€500,000' to 500000
     const parsedPrice = parseInt(String(maxPrice).replace(/[^0-9]/g, ''), 10);
     if (!isNaN(parsedPrice)) {
       filters.price = { lte: parsedPrice };
     }
+  }
+
+  if (minBedrooms && minBedrooms !== 'Todos' && Number(minBedrooms) > 0) {
+    filters.bedrooms = { gte: parseInt(String(minBedrooms), 10) };
+  }
+
+  if (minBathrooms && minBathrooms !== 'Todos' && Number(minBathrooms) > 0) {
+    filters.bathrooms = { gte: parseInt(String(minBathrooms), 10) };
+  }
+
+  if (minGarages && minGarages !== 'Todos' && Number(minGarages) > 0) {
+    filters.garages = { gte: parseInt(String(minGarages), 10) };
+  }
+
+  if (stratum && stratum !== 'Todos' && Number(stratum) > 0) {
+    filters.stratum = parseInt(String(stratum), 10);
   }
 
   const properties = await prisma.property.findMany({
@@ -72,28 +127,70 @@ import { StorageService } from '../services/storageService';
 export const createProperty = async (req: Request, res: Response) => {
   try {
     const agentId = String((req as any).user.id);
-    const { title, description, price, location, type, status, bedrooms, bathrooms, area, featured } = req.body;
+    const {
+      code,
+      title,
+      description,
+      price,
+      adminFee,
+      location,
+      latitude,
+      longitude,
+      type,
+      status,
+      propertyCondition,
+      bedrooms,
+      bathrooms,
+      garages,
+      area,
+      builtArea,
+      stratum,
+      floor,
+      yearBuilt,
+      amenities,
+      videoUrl,
+      virtualTourUrl,
+      featured
+    } = req.body;
     
     // Archivos de imagen subidos vía Multer (ahora en memoria)
     const files = req.files as Express.Multer.File[];
     
-    // Subir cada archivo a Supabase Storage
+    // Subir cada archivo a Supabase Storage (o disco local)
     const uploadPromises = files ? files.map(file => StorageService.uploadFile(file, 'properties')) : [];
     const imageUrls = await Promise.all(uploadPromises);
     
     const imagesData = imageUrls.map(url => ({ url }));
 
+    const generatedCode =
+      code && String(code).trim().length > 0
+        ? String(code).trim().toUpperCase()
+        : `CR-${Math.floor(1000 + Math.random() * 9000)}`;
+
     const property = await prisma.property.create({
       data: {
+        code: generatedCode,
         title,
         description,
         price: parseFloat(price),
+        adminFee: parseOptionalFloat(adminFee),
         location,
+        latitude: parseOptionalFloat(latitude),
+        longitude: parseOptionalFloat(longitude),
         type,
         status,
-        bedrooms: parseInt(bedrooms),
-        bathrooms: parseInt(bathrooms),
+        propertyCondition: propertyCondition ? String(propertyCondition) : 'Excelente',
+        bedrooms: parseInt(bedrooms, 10) || 0,
+        bathrooms: parseInt(bathrooms, 10) || 0,
+        garages: parseInt(garages, 10) || 0,
         area: parseFloat(area),
+        builtArea: parseOptionalFloat(builtArea),
+        stratum: parseOptionalInt(stratum),
+        floor: parseOptionalInt(floor),
+        yearBuilt: parseOptionalInt(yearBuilt),
+        amenities: parseAmenities(amenities),
+        videoUrl: videoUrl && String(videoUrl).trim() ? String(videoUrl).trim() : null,
+        virtualTourUrl: virtualTourUrl && String(virtualTourUrl).trim() ? String(virtualTourUrl).trim() : null,
         featured: featured === 'true' || featured === true,
         agentId,
         images: {
@@ -154,7 +251,31 @@ export const updateProperty = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, error: 'No tienes permiso para editar esta propiedad' });
     }
 
-    const { title, description, price, location, type, status, bedrooms, bathrooms, area, featured } = req.body;
+    const {
+      code,
+      title,
+      description,
+      price,
+      adminFee,
+      location,
+      latitude,
+      longitude,
+      type,
+      status,
+      propertyCondition,
+      bedrooms,
+      bathrooms,
+      garages,
+      area,
+      builtArea,
+      stratum,
+      floor,
+      yearBuilt,
+      amenities,
+      videoUrl,
+      virtualTourUrl,
+      featured
+    } = req.body;
     const files = req.files as Express.Multer.File[];
     
     const updateData: any = {
@@ -164,21 +285,59 @@ export const updateProperty = async (req: Request, res: Response) => {
       location,
       type,
       status,
-      bedrooms: bedrooms ? parseInt(bedrooms) : undefined,
-      bathrooms: bathrooms ? parseInt(bathrooms) : undefined,
+      bedrooms: bedrooms !== undefined ? parseInt(bedrooms, 10) : undefined,
+      bathrooms: bathrooms !== undefined ? parseInt(bathrooms, 10) : undefined,
+      garages: garages !== undefined ? parseInt(garages, 10) || 0 : undefined,
       area: area ? parseFloat(area) : undefined,
       featured: featured !== undefined ? featured === 'true' || featured === true : undefined,
     };
 
+    if (code !== undefined) {
+      updateData.code = code && String(code).trim() ? String(code).trim().toUpperCase() : existingProperty.code;
+    }
+    if (propertyCondition !== undefined) {
+      updateData.propertyCondition = propertyCondition ? String(propertyCondition) : 'Excelente';
+    }
+    if (adminFee !== undefined) {
+      updateData.adminFee = parseOptionalFloat(adminFee);
+    }
+    if (builtArea !== undefined) {
+      updateData.builtArea = parseOptionalFloat(builtArea);
+    }
+    if (stratum !== undefined) {
+      updateData.stratum = parseOptionalInt(stratum);
+    }
+    if (floor !== undefined) {
+      updateData.floor = parseOptionalInt(floor);
+    }
+    if (yearBuilt !== undefined) {
+      updateData.yearBuilt = parseOptionalInt(yearBuilt);
+    }
+    if (amenities !== undefined) {
+      updateData.amenities = parseAmenities(amenities);
+    }
+    if (videoUrl !== undefined) {
+      updateData.videoUrl = videoUrl && String(videoUrl).trim() && videoUrl !== 'null' ? String(videoUrl).trim() : null;
+    }
+    if (virtualTourUrl !== undefined) {
+      updateData.virtualTourUrl = virtualTourUrl && String(virtualTourUrl).trim() && virtualTourUrl !== 'null' ? String(virtualTourUrl).trim() : null;
+    }
+    if (latitude !== undefined) {
+      updateData.latitude = parseOptionalFloat(latitude);
+    }
+    if (longitude !== undefined) {
+      updateData.longitude = parseOptionalFloat(longitude);
+    }
+
     if (files && files.length > 0) {
-      // 1. Eliminar imágenes anteriores de la nube
+      // 1. Eliminar imágenes anteriores
       const deletePromises = existingProperty.images.map(img => StorageService.deleteFile(img.url));
       await Promise.all(deletePromises);
 
       // 2. Eliminar de la DB
       await prisma.image.deleteMany({ where: { propertyId: id } });
 
-      // 3. Subir nuevas a la nube
+      // 3. Subir nuevas
       const uploadPromises = files.map(file => StorageService.uploadFile(file, 'properties'));
       const imageUrls = await Promise.all(uploadPromises);
       

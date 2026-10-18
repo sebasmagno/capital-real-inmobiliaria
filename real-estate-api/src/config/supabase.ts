@@ -10,4 +10,7 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('[Supabase] Falta configuración de SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el archivo .env');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
+

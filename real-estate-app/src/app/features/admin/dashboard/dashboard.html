@@ -6,6 +6,10 @@
         <p class="text-slate-500 text-sm">Resumen general de tu actividad inmobiliaria.</p>
       </div>
       <div class="flex items-center gap-3">
+        <button (click)="navigateTo('/admin/leads')" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 text-sm font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-primary-600"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+          Ver Bandeja CRM
+        </button>
         <button (click)="navigateTo('/admin/properties/new')" class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-primary-200 flex items-center gap-2 group">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 group-hover:scale-110 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
           Nueva Propiedad
@@ -14,48 +18,64 @@
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
       <!-- Card 1: Propiedades Totales -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow cursor-default">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow cursor-default">
         <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.75M5.25 9h3.75m-3.75 3h3.75m3-3h3.75m-3.75 3h3.75M8.25 15h3.75m3-3h3.75M15.75 21h2.25c.621 0 1.125-.504 1.125-1.125V3.75c0-.621-.504-1.125-1.125-1.125H15.75m-10.5 0A2.25 2.25 0 003 3.75v16.5c0 .621.504 1.125 1.125 1.125h2.25m-10.5 0h10.5" /></svg>
         </div>
         <div>
-          <p class="text-sm font-medium text-slate-500">Propiedades</p>
+          <p class="text-xs font-medium text-slate-500">Propiedades</p>
           <p class="text-2xl font-black text-slate-900">{{ stats()?.totalProperties || 0 }}</p>
         </div>
       </div>
 
       <!-- Card 2: En Venta -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-emerald-50/50 transition-all border-l-4 border-l-emerald-500" (click)="navigateTo('/admin/properties')">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-emerald-50/50 transition-all border-l-4 border-l-emerald-500" (click)="navigateTo('/admin/properties')">
         <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25c.621 0 1.125.504 1.125 1.125V18.75c0 .621-.504 1.125-1.125 1.125H3.75c-.621 0-1.125-.504-1.125-1.125V4.5m10.5 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
         </div>
         <div>
-          <p class="text-sm font-medium text-slate-500">En Venta</p>
+          <p class="text-xs font-medium text-slate-500">En Venta</p>
           <p class="text-2xl font-black text-slate-900">{{ getStatusCount('Venta') }}</p>
         </div>
       </div>
 
       <!-- Card 3: En Alquiler -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-amber-50/50 transition-all border-l-4 border-l-amber-500" (click)="navigateTo('/admin/properties')">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-amber-50/50 transition-all border-l-4 border-l-amber-500" (click)="navigateTo('/admin/properties')">
         <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.651V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .414.336.75.75.75z" /></svg>
         </div>
         <div>
-          <p class="text-sm font-medium text-slate-500">Alquiler</p>
+          <p class="text-xs font-medium text-slate-500">Alquiler</p>
           <p class="text-2xl font-black text-slate-900">{{ getStatusCount('Alquiler') }}</p>
         </div>
       </div>
 
       <!-- Card 4: Destacadas -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-purple-50/50 transition-all border-l-4 border-l-purple-500" (click)="navigateTo('/admin/properties')">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-purple-50/50 transition-all border-l-4 border-l-purple-500" (click)="navigateTo('/admin/properties')">
         <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
         </div>
         <div>
-          <p class="text-sm font-medium text-slate-500">Destacadas</p>
+          <p class="text-xs font-medium text-slate-500">Destacadas</p>
           <p class="text-2xl font-black text-slate-900">{{ stats()?.featuredCount || 0 }}</p>
+        </div>
+      </div>
+
+      <!-- Card 5: Leads / CRM -->
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 cursor-pointer hover:bg-indigo-50/50 transition-all border-l-4 border-l-indigo-600" (click)="navigateTo('/admin/leads')">
+        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" /></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <p class="text-xs font-medium text-slate-500">Leads CRM</p>
+            @if ((stats()?.newLeadsCount || 0) > 0) {
+              <span class="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-indigo-600 text-white">{{ stats()?.newLeadsCount }} nuevos</span>
+            }
+          </div>
+          <p class="text-2xl font-black text-slate-900">{{ stats()?.totalLeads || 0 }}</p>
         </div>
       </div>
     </div>
@@ -135,35 +155,74 @@
       </div>
     </div>
 
-    <!-- Bottom Row: Recent Activity -->
-    <div class="mt-6">
+    <!-- Bottom Row: Recent Leads & Recent Properties -->
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Últimos Prospectos / Leads -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-lg font-bold text-slate-900">Actividad Reciente</h2>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Últimos Prospectos (CRM)</h2>
+            <p class="text-xs text-slate-400">Solicitudes de clientes recibidas recientemente</p>
+          </div>
+          <button (click)="navigateTo('/admin/leads')" class="text-primary-600 text-xs font-bold hover:underline">Ir al CRM</button>
+        </div>
+
+        <div class="space-y-3">
+          @for (lead of stats()?.recentLeads; track lead.id) {
+            <div (click)="navigateTo('/admin/leads')" class="flex items-center justify-between gap-4 p-3.5 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 font-black flex items-center justify-center shrink-0 uppercase">
+                  {{ lead.name.charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-slate-900 truncate">{{ lead.name }}</p>
+                  <p class="text-xs text-slate-500 truncate">
+                    {{ lead.property?.title || 'Consulta General' }}
+                  </p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 uppercase">
+                  {{ lead.status }}
+                </span>
+                <p class="text-[10px] text-slate-400 mt-1">{{ lead.createdAt | date:'dd/MM HH:mm' }}</p>
+              </div>
+            </div>
+          } @empty {
+            <div class="text-center py-10">
+              <p class="text-slate-400 text-sm font-medium">Aún no se han recibido prospectos</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actividad Reciente de Propiedades -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Propiedades Recientes</h2>
+            <p class="text-xs text-slate-400">Últimos inmuebles publicados en el catálogo</p>
+          </div>
           <button (click)="navigateTo('/admin/properties')" class="text-primary-600 text-xs font-bold hover:underline">Gestionar todo</button>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="space-y-3">
           @for (property of stats()?.recentProperties; track property.id) {
-            <div (click)="navigateTo('/admin/properties/edit/' + property.id)" class="flex gap-4 p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 hover:border-slate-200 transition-all group cursor-pointer shadow-sm">
-              <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-inner bg-slate-100">
+            <div (click)="navigateTo('/admin/properties/edit/' + property.id)" class="flex gap-4 p-3.5 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all group cursor-pointer">
+              <div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100">
                 <img [src]="(property.images && property.images.length > 0 && property.images[0].url.startsWith('http')) ? property.images[0].url : apiUrl.replace('/api', '') + (property.images && property.images.length > 0 ? property.images[0].url : '/uploads/placeholder.jpg')" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               </div>
-              <div class="min-w-0 flex flex-col justify-center">
+              <div class="min-w-0 flex-1 flex flex-col justify-center">
                 <p class="text-sm font-bold text-slate-900 truncate group-hover:text-primary-600 transition-colors">{{ property.title }}</p>
                 <div class="flex items-center gap-2 mt-1">
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">{{ property.type }}</span>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary-50 text-primary-600 uppercase">{{ property.status }}</span>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1 font-medium">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Publicado {{ property.createdAt | date:'shortTime' }}
-                </p>
               </div>
             </div>
           } @empty {
-            <div class="col-span-full text-center py-12">
-              <p class="text-slate-400 text-sm font-medium">No hay actividad reciente para mostrar</p>
+            <div class="text-center py-10">
+              <p class="text-slate-400 text-sm font-medium">No hay propiedades recientes para mostrar</p>
             </div>
           }
         </div>

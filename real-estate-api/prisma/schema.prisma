@@ -21,27 +21,42 @@ model User {
   updatedAt DateTime @updatedAt
   
   properties Property[]
+  leads      Lead[]
 }
 
 model Property {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  price       Float
-  location    String
-  type        String
-  status      String   // "Venta", "Alquiler"
-  bedrooms    Int
-  bathrooms   Int
-  area        Float
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(uuid())
+  code              String?
+  title             String
+  description       String?
+  price             Float
+  adminFee          Float?
+  location          String
+  latitude          Float?
+  longitude         Float?
+  type              String
+  status            String   // "Venta", "Alquiler"
+  propertyCondition String?  @default("Excelente") // "Sobre planos", "Para estrenar", "Excelente", "Remodelado", "Para remodelar"
+  bedrooms          Int
+  bathrooms         Int
+  garages           Int      @default(0)
+  area              Float
+  builtArea         Float?
+  stratum           Int?
+  floor             Int?
+  yearBuilt         Int?
+  amenities         String[] @default([])
+  videoUrl          String?
+  virtualTourUrl    String?
+  featured          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   agentId     String
   agent       User     @relation(fields: [agentId], references: [id])
   
   images      Image[]
+  leads       Lead[]
 }
 
 model Image {
@@ -50,6 +65,24 @@ model Image {
   propertyId String
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+}
+
+model Lead {
+  id              String    @id @default(uuid())
+  name            String
+  email           String
+  phone           String?
+  message         String
+  source          String    @default("WEB_CONTACTO") // "WEB_PROPIEDAD", "WHATSAPP_PROPIEDAD", "WEB_CONTACTO", "WHATSAPP_CONTACTO"
+  status          String    @default("NUEVO")        // "NUEVO", "CONTACTADO", "VISITA_AGENDADA", "EN_NEGOCIACION", "CERRADO", "DESCARTADO"
+  preferredDate   DateTime?
+  notes           String?
+  propertyId      String?
+  property        Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  assignedAgentId String?
+  assignedAgent   User?     @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Settings {

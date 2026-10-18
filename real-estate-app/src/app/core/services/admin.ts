@@ -22,6 +22,10 @@ export interface DashboardStats {
   propertiesByType: { type: string; _count: { _all: number } }[];
   recentProperties: any[];
   monthlyDistribution: { month: string; count: number }[];
+  totalLeads?: number;
+  newLeadsCount?: number;
+  leadsByStatus?: { status: string; _count: { _all: number } }[];
+  recentLeads?: any[];
 }
 
 @Injectable({

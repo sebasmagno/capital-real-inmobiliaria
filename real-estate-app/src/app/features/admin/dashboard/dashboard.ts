@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AdminService, DashboardStats } from '../../../core/services/admin';
+import { LeadService } from '../../../core/services/lead';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
@@ -14,6 +15,7 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class Dashboard implements OnInit {
   private adminService = inject(AdminService);
+  private leadService = inject(LeadService);
   private toastService = inject(ToastService);
   private router = inject(Router);
   
@@ -28,13 +30,13 @@ export class Dashboard implements OnInit {
   fetchStats() {
     this.adminService.getStats().subscribe({
       next: (res) => {
-        setTimeout(() => {
-          if (res.success) {
-            console.log('[Dashboard] Stats received:', res.data);
-            this.stats.set(res.data);
+        if (res.success) {
+          this.stats.set(res.data);
+          if (res.data.newLeadsCount !== undefined) {
+            this.leadService.newLeadsCount.set(res.data.newLeadsCount);
           }
-          this.isLoading.set(false);
-        }, 800);
+        }
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error fetching stats:', err);

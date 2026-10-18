@@ -12,6 +12,7 @@ import { Dashboard } from './features/admin/dashboard/dashboard';
 import { AdminAgentsList } from './features/admin/admin-agents-list/admin-agents-list';
 import { AdminAgentForm } from './features/admin/admin-agent-form/admin-agent-form';
 import { AdminSettings } from './features/admin/admin-settings/admin-settings';
+import { AdminLeads } from './features/admin/admin-leads/admin-leads';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -31,6 +32,7 @@ export const routes: Routes = [
       // Al entrar a /admin redirige directamente al dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
+      { path: 'leads', component: AdminLeads },
       { path: 'properties', component: AdminPropertiesList },
       { path: 'properties/new', component: AdminPropertyForm },
       { path: 'properties/edit/:id', component: AdminPropertyForm },

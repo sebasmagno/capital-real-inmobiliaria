@@ -2,12 +2,55 @@
   <div class="animate-fade-in-up">
     <!-- Header Image -->
     <div class="w-full h-[50vh] md:h-[60vh] relative">
-      <img [src]="p.images && p.images.length > 0 ? (p.images[0].url?.startsWith('http') ? p.images[0].url : apiUrl.replace('/api', '') + p.images[0].url) : '/uploads/placeholder.jpg'" [alt]="p.title" class="w-full h-full object-cover" />
+      <img [src]="p.images && p.images.length > 0 ? (p.images[0].url.startsWith('http') ? p.images[0].url : apiUrl.replace('/api', '') + p.images[0].url) : '/uploads/placeholder.jpg'" [alt]="p.title" class="w-full h-full object-cover" />
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
       
       <div class="absolute bottom-0 left-0 w-full p-8 md:p-12 max-w-7xl mx-auto">
-        <div class="inline-block py-1 px-3 rounded-full bg-primary-600 text-white font-bold text-xs mb-4 uppercase tracking-wider">
-          En {{ p.status }}
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-block py-1 px-3 rounded-full bg-primary-600 text-white font-bold text-xs uppercase tracking-wider">
+              En {{ p.status }}
+            </span>
+            <span class="inline-block py-1 px-3 rounded-full bg-slate-900/80 backdrop-blur text-white font-bold text-xs uppercase tracking-wider border border-white/15">
+              {{ p.type }}
+            </span>
+            @if (p.code) {
+              <span class="inline-block py-1 px-3 rounded-full bg-white/90 backdrop-blur text-slate-900 font-mono font-black text-xs tracking-wider">
+                CÓD: {{ p.code }}
+              </span>
+            }
+            @if (p.propertyCondition) {
+              <span class="inline-block py-1 px-3 rounded-full bg-emerald-500/90 backdrop-blur text-white font-bold text-xs tracking-wide">
+                {{ p.propertyCondition }}
+              </span>
+            }
+            @if (p.stratum) {
+              <span class="inline-block py-1 px-3 rounded-full bg-amber-500/90 backdrop-blur text-white font-bold text-xs tracking-wide">
+                Estrato {{ p.stratum }}
+              </span>
+            }
+          </div>
+
+          <div class="flex items-center gap-2 print:hidden">
+            <button
+              type="button"
+              (click)="shareProperty()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 hover:bg-white text-slate-900 text-xs font-bold shadow-md transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+              </svg>
+              Compartir
+            </button>
+            <button
+              type="button"
+              (click)="printTechnicalSheet()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold shadow-md border border-white/15 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+              </svg>
+              Imprimir Ficha PDF
+            </button>
+          </div>
         </div>
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-md">{{ p.title }}</h1>
         <p class="text-xl text-slate-200 flex items-center gap-2">
@@ -26,50 +69,178 @@
         <div class="lg:col-span-2 space-y-10">
           
           <!-- Key Stats -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-            <div class="px-4">
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <div class="px-3 col-span-2 sm:col-span-1">
               <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Precio</p>
               <div class="flex flex-col">
-                <p class="text-2xl font-black text-primary-600 leading-none">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</p>
-                <span *ngIf="p.status === 'Alquiler'" class="text-xs text-slate-400 font-bold mt-1">/ MES</span>
+                <p class="text-xl md:text-2xl font-black text-primary-600 leading-none">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</p>
+                @if (p.status === 'Alquiler') {
+                  <span class="text-xs text-slate-400 font-bold mt-1">/ MES</span>
+                }
+                @if (p.adminFee && p.adminFee > 0) {
+                  <span class="text-[11px] text-slate-500 font-semibold mt-1">
+                    + Admón: {{ p.adminFee | currency:'COP':'symbol':'1.0-0' }}
+                  </span>
+                }
               </div>
             </div>
             
-            <div class="px-4 border-l border-slate-100">
+            <div class="px-3 border-l border-slate-100">
               <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Habs</p>
               <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bedrooms }}</p>
             </div>
             
-            <div class="px-4 border-l border-slate-100">
+            <div class="px-3 border-l border-slate-100">
               <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Baños</p>
               <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bathrooms }}</p>
             </div>
+
+            <div class="px-3 border-l border-slate-100">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Garajes</p>
+              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.garages ?? 0 }}</p>
+            </div>
             
-            <div class="px-4 border-l border-slate-100">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Área</p>
+            <div class="px-3 border-l border-slate-100">
+              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Área Total</p>
               <div class="flex items-baseline gap-1">
                 <p class="text-2xl font-black text-slate-900 leading-none">{{ p.area }}</p>
                 <span class="text-xs font-bold text-slate-400">m²</span>
               </div>
+              @if (p.builtArea) {
+                <span class="text-[11px] text-slate-500 font-medium">Const: {{ p.builtArea }} m²</span>
+              }
             </div>
           </div>
 
           <!-- Description -->
-          <div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Descripción</h2>
-            <p class="text-slate-600 leading-relaxed text-lg whitespace-pre-line">
+          <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Descripción General</h2>
+            <p class="text-slate-600 leading-relaxed text-base md:text-lg whitespace-pre-line">
               {{ p.description || 'Sin descripción disponible.' }}
             </p>
           </div>
 
+          <!-- Ficha Técnica Detallada del Inmueble -->
+          <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+                  <span class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+                    </svg>
+                  </span>
+                  Ficha Técnica del Inmueble
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">Especificaciones arquitectónicas, legales y financieras verificadas</p>
+              </div>
+              @if (p.code) {
+                <span class="text-xs font-mono font-bold bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto">
+                  Referencia: {{ p.code }}
+                </span>
+              }
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipo de Inmueble</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.type }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipo de Negocio</p>
+                <p class="text-sm font-black text-primary-600 mt-1">{{ p.status }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Condición Física</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.propertyCondition || 'Excelente' }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Área Total / Lote</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.area }} m²</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Área Construida</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.builtArea ? p.builtArea + ' m²' : p.area + ' m²' }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estrato Socioeconómico</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.stratum ? 'Estrato ' + p.stratum : 'Comercial / Campestre' }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Parqueaderos</p>
+                <p class="text-sm font-black text-slate-900 mt-1">{{ p.garages && p.garages > 0 ? p.garages + ' ' + (p.garages === 1 ? 'Vehículo' : 'Vehículos') : 'Sin parqueadero privado' }}</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Valor Administración</p>
+                <p class="text-sm font-black text-slate-900 mt-1">
+                  @if (p.adminFee && p.adminFee > 0) {
+                    {{ p.adminFee | currency:'COP':'symbol':'1.0-0' }} / mes
+                  } @else {
+                    No aplica / Incluida
+                  }
+                </p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Valor por m²</p>
+                <p class="text-sm font-black text-slate-900 mt-1">
+                  {{ (p.area > 0 ? (p.price / p.area) : p.price) | currency:'COP':'symbol':'1.0-0' }} / m²
+                </p>
+              </div>
+
+              @if (p.floor) {
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Piso / Niveles</p>
+                  <p class="text-sm font-black text-slate-900 mt-1">{{ p.floor }}</p>
+                </div>
+              }
+
+              @if (p.yearBuilt) {
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Año de Construcción</p>
+                  <p class="text-sm font-black text-slate-900 mt-1">{{ p.yearBuilt }}</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Comodidades y Zonas Sociales (Amenities) -->
+          @if (p.amenities && p.amenities.length > 0) {
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-5">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900">Comodidades y Zonas Sociales</h2>
+                <p class="text-xs text-slate-500 mt-1">Equipamiento interior del inmueble y amenidades del conjunto</p>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                @for (amenity of p.amenities; track amenity) {
+                  <div class="flex items-center gap-2.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 text-xs font-bold">
+                    <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </span>
+                    <span class="truncate">{{ amenity }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           <!-- Image Gallery -->
           @if (p.images && p.images.length > 1) {
-            <div>
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100">
               <h2 class="text-2xl font-bold text-slate-900 mb-6">Galería de Fotos</h2>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 @for (img of p.images; track $index) {
                   <div (click)="openLightbox($index)" class="aspect-square rounded-xl overflow-hidden group cursor-pointer border border-slate-100 shadow-sm relative">
-                    <img [src]="img.url?.startsWith('http') ? img.url : apiUrl.replace('/api', '') + img.url" [alt]="p.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img [src]="img.url.startsWith('http') ? img.url : apiUrl.replace('/api', '') + img.url" [alt]="p.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <!-- Icono lupa hover -->
                     <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-white">
@@ -82,50 +253,153 @@
             </div>
           }
 
+          <!-- Multimedia Avanzada: Video Recorrido y Tour Virtual 360° -->
+          @if (p.videoUrl || p.virtualTourUrl) {
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6 print:hidden">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900">Experiencia Multimedia & Tour 360°</h2>
+                <p class="text-xs text-slate-500 mt-1">Recorre la propiedad de forma inmersiva desde cualquier dispositivo</p>
+              </div>
+
+              @if (getSafeVideoEmbedUrl(p.videoUrl); as safeVideo) {
+                <div class="space-y-2">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Video Recorrido</h3>
+                  <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm">
+                    <iframe
+                      [src]="safeVideo"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+                    </iframe>
+                  </div>
+                </div>
+              }
+
+              @if (getSafeVirtualTourUrl(p.virtualTourUrl); as safeTour) {
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Recorrido Virtual 360°</h3>
+                    <a [href]="p.virtualTourUrl!" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-primary-600 hover:underline">
+                      Abrir en pantalla completa ↗
+                    </a>
+                  </div>
+                  <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm">
+                    <iframe
+                      [src]="safeTour"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allowfullscreen>
+                    </iframe>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Ubicación e Interactivo en Mapa -->
+          <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+                  <span class="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                  </span>
+                  Ubicación en el Mapa
+                </h2>
+                <p class="text-sm text-slate-500 mt-1">{{ p.location }}</p>
+              </div>
+              <a
+                [href]="p.latitude != null && p.longitude != null ? 'https://www.google.com/maps/search/?api=1&query=' + p.latitude + ',' + p.longitude : 'https://www.google.com/maps/search/?api=1&query=' + p.location"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-primary-600 text-white text-xs font-bold transition-colors self-start sm:self-auto shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+                Cómo llegar en Google Maps
+              </a>
+            </div>
+
+            <app-property-map
+              mode="single"
+              [latitude]="p.latitude"
+              [longitude]="p.longitude"
+              [title]="p.title"
+              [locationText]="p.location"
+              [price]="p.price"
+              heightClass="h-[380px]">
+            </app-property-map>
+          </div>
+
         </div>
 
         <!-- Sidebar / Contact Agent -->
         <div class="lg:col-span-1">
           <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 sticky top-24">
-            <h3 class="text-xl font-bold text-slate-900 mb-6">Me interesa esta propiedad</h3>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Me interesa esta propiedad</h3>
+            <p class="text-xs text-slate-500 mb-6">Déjanos tus datos o agenda una visita personalizada.</p>
             
-            <div class="flex items-center gap-4 mb-8">
-              <div class="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-xl border-2 border-primary-200">
+            <div class="flex items-center gap-4 mb-6 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-lg border-2 border-primary-200 shrink-0">
                 {{ p.agent.name.charAt(0) || 'A' }}
               </div>
-              <div>
-                <p class="font-bold text-slate-900 leading-tight">{{ p.agent.name || 'Agente' }}</p>
-                <p class="text-xs text-slate-500">{{ configService.settings().contactEmail }}</p>
+              <div class="min-w-0">
+                <p class="font-bold text-slate-900 text-sm truncate">{{ p.agent.name || 'Asesor Comercial' }}</p>
+                <p class="text-xs text-slate-500 truncate">{{ p.agent.email || configService.settings().contactEmail }}</p>
               </div>
             </div>
 
+            @if (inquirySent()) {
+              <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="font-bold">¡Solicitud registrada!</p>
+                  <p class="text-xs text-emerald-700 mt-0.5">Un asesor de {{ configService.settings().companyName }} te contactará muy pronto.</p>
+                </div>
+              </div>
+            }
+
             <form [formGroup]="contactForm" (ngSubmit)="sendInquiry()" class="space-y-4">
               <div>
-                <input type="text" formControlName="name" placeholder="Tu Nombre" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Nombre completo *</label>
+                <input type="text" formControlName="name" placeholder="Ej. Carlos Ramírez" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
               </div>
               <div>
-                <input type="email" formControlName="email" placeholder="Tu Email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Correo electrónico *</label>
+                <input type="email" formControlName="email" placeholder="carlos@correo.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
               </div>
               <div>
-                <input type="tel" formControlName="phone" placeholder="Tu Teléfono" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Teléfono / WhatsApp *</label>
+                <input type="tel" formControlName="phone" placeholder="+57 300 000 0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
               </div>
               <div>
-                <textarea rows="4" formControlName="message" placeholder="Mensaje..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none transition-all"></textarea>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Fecha tentativa de visita (Opcional)</label>
+                <input type="date" formControlName="preferredDate" [min]="minDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Mensaje *</label>
+                <textarea rows="3" formControlName="message" placeholder="Mensaje..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none transition-all"></textarea>
               </div>
               
-              <div class="flex flex-col gap-3">
-                <button type="submit" [disabled]="isSending() || contactForm.invalid" class="w-full bg-slate-900 hover:bg-primary-700 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+              <div class="flex flex-col gap-3 pt-1">
+                <button type="submit" [disabled]="isSending() || contactForm.invalid" class="w-full bg-slate-900 hover:bg-primary-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm">
                   @if (isSending()) {
                     <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    <span>Enviando...</span>
+                    <span>Registrando solicitud...</span>
                   } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
-                    <span>Solicitar por Correo</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+                    <span>Solicitar Información / Agendar</span>
                   }
                 </button>
 
-                <button type="button" (click)="contactViaWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 px-4 rounded-xl transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-3">
-                  <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <button type="button" (click)="contactViaWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-2.5 text-sm">
+                  <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                   </svg>
                   <span>Contactar por WhatsApp</span>
@@ -159,7 +433,7 @@
       }
 
       <!-- Imagen expandida -->
-      <img [src]="p.images[selectedImageIndex()!].url?.startsWith('http') ? p.images[selectedImageIndex()!].url : apiUrl.replace('/api', '') + p.images[selectedImageIndex()!].url" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in" (click)="$event.stopPropagation()" />
+      <img [src]="p.images[selectedImageIndex()!].url.startsWith('http') ? p.images[selectedImageIndex()!].url : apiUrl.replace('/api', '') + p.images[selectedImageIndex()!].url" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in" (click)="$event.stopPropagation()" />
       
       <!-- Contador -->
       @if (p.images.length > 1) {

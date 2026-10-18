@@ -64,7 +64,7 @@
                 Destacado
               </div>
             }
-            @if (property.images?.[0]?.url; as url) {
+            @if (property.images[0]?.url; as url) {
               <img [src]="url.startsWith('http') ? url : apiUrl.replace('/api', '') + url" [alt]="property.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
             } @else {
               <img [src]="'/uploads/placeholder.jpg'" [alt]="property.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />

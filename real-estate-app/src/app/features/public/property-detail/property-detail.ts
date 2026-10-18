@@ -2,26 +2,30 @@ import { Component, inject, signal, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { Title, Meta } from '@angular/platform-browser';
+import { Title, Meta, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
+import { LeadService } from '../../../core/services/lead';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfigService } from '../../../core/services/config';
 import { environment } from '../../../../environments/environment';
+import { PropertyMap } from '../../../shared/components/property-map/property-map';
 
 @Component({
   selector: 'app-property-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, PropertyMap],
   templateUrl: './property-detail.html',
   styleUrl: './property-detail.css'
 })
 export class PropertyDetail {
   private propertyService = inject(PropertyService);
+  private leadService = inject(LeadService);
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   public configService = inject(ConfigService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
+  private sanitizer = inject(DomSanitizer);
   
   // Recibimos el ID directamente del Router mediante un input de señal
   id = input.required<string>();
@@ -29,12 +33,15 @@ export class PropertyDetail {
   property = signal<Property | null>(null);
   selectedImageIndex = signal<number | null>(null);
   isSending = signal(false);
+  inquirySent = signal(false);
   apiUrl = environment.apiUrl;
+  minDate = new Date().toISOString().split('T')[0];
 
   contactForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required]],
+    preferredDate: [''],
     message: ['Hola, me gustaría tener más información sobre esta propiedad...', [Validators.required]]
   });
 
@@ -44,6 +51,40 @@ export class PropertyDetail {
       const currentId = this.id();
       this.loadProperty(currentId);
     });
+  }
+
+  getSafeVideoEmbedUrl(rawUrl?: string | null): SafeResourceUrl | null {
+    if (!rawUrl || !rawUrl.trim()) return null;
+    const url = rawUrl.trim();
+    let embedUrl = url;
+
+    // Convertir URL de YouTube estándar o corta a formato embed
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/);
+    if (ytMatch && ytMatch[1]) {
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  getSafeVirtualTourUrl(rawUrl?: string | null): SafeResourceUrl | null {
+    if (!rawUrl || !rawUrl.trim()) return null;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl.trim());
+  }
+
+  printTechnicalSheet() {
+    window.print();
+  }
+
+  shareProperty() {
+    const p = this.property();
+    const shareUrl = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        this.toastService.success('¡Enlace de la ficha copiado al portapapeles!');
+      });
+    } else if (p) {
+      this.toastService.info(`Comparte: ${shareUrl}`);
+    }
   }
 
   private loadProperty(id: string) {
@@ -76,48 +117,48 @@ export class PropertyDetail {
 
   sendInquiry() {
     if (this.contactForm.invalid) {
-      this.toastService.error('Por favor, completa todos los campos correctamente.');
+      this.contactForm.markAllAsTouched();
+      this.toastService.error('Por favor, completa todos los campos requeridos correctamente.');
       return;
     }
 
     const formData = this.contactForm.value;
     const p = this.property();
-    const companyEmail = this.configService.settings().contactEmail;
 
     if (!p) return;
 
     this.isSending.set(true);
-    
-    // Construimos el enlace mailto
-    const subject = encodeURIComponent(`Interés en Propiedad: ${p.title}`);
-    const body = encodeURIComponent(
-      `Hola, mi nombre es ${formData.name}.\n\n` +
-      `Estoy interesado en la propiedad "${p.title}" ubicada en ${p.location}.\n\n` +
-      `Mensaje: ${formData.message}\n\n` +
-      `Mis datos de contacto:\n` +
-      `- Email: ${formData.email}\n` +
-      `- Teléfono: ${formData.phone}\n\n` +
-      `Espero su respuesta. Saludos.`
-    );
 
-    const mailtoLink = `mailto:${companyEmail}?subject=${subject}&body=${body}`;
-
-    // Simulamos un pequeño proceso visual antes de abrir el correo
-    setTimeout(() => {
-      this.isSending.set(false);
-      
-      // Abrimos el cliente de correo del usuario
-      window.location.href = mailtoLink;
-
-      this.toastService.success('Abriendo tu aplicación de correo...');
-      
-      this.contactForm.reset({
-        name: '',
-        email: '',
-        phone: '',
-        message: 'Hola, me gustaría tener más información sobre esta propiedad...'
-      });
-    }, 800);
+    this.leadService.createLead({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.message,
+      preferredDate: formData.preferredDate || null,
+      propertyId: p.id,
+      source: 'WEB_PROPIEDAD'
+    }).subscribe({
+      next: () => {
+        this.isSending.set(false);
+        this.inquirySent.set(true);
+        this.toastService.success(
+          formData.preferredDate
+            ? '¡Solicitud y agenda de visita registradas con éxito!'
+            : '¡Solicitud registrada! Nuestro asesor te contactará pronto.'
+        );
+        this.contactForm.reset({
+          name: '',
+          email: '',
+          phone: '',
+          preferredDate: '',
+          message: 'Hola, me gustaría tener más información sobre esta propiedad...'
+        });
+      },
+      error: (err) => {
+        this.isSending.set(false);
+        this.toastService.error(err.error?.error || 'No se pudo enviar la solicitud. Intenta de nuevo.');
+      }
+    });
   }
 
   contactViaWhatsApp() {
@@ -132,13 +173,27 @@ export class PropertyDetail {
     let message = '';
     const formData = this.contactForm.value;
 
-    // Si el formulario es válido, enviamos mensaje completo. 
-    // Si no, enviamos uno genérico para no bloquear al usuario.
+    // Si el usuario completó datos en el formulario, registramos también el Lead en el CRM
+    if (formData.name && (formData.email || formData.phone)) {
+      this.leadService.createLead({
+        name: formData.name,
+        email: formData.email || 'sin-correo@whatsapp.local',
+        phone: formData.phone || '',
+        message: formData.message || `Contacto vía WhatsApp por ${p.title}`,
+        preferredDate: formData.preferredDate || null,
+        propertyId: p.id,
+        source: 'WHATSAPP_PROPIEDAD'
+      }).subscribe({ error: () => {} });
+    }
+
     if (this.contactForm.valid) {
+      const visitLine = formData.preferredDate
+        ? `\nFecha tentativa de visita: ${formData.preferredDate}`
+        : '';
       message = encodeURIComponent(
         `Hola, mi nombre es ${formData.name}.\n` +
         `Me interesa la propiedad: *${p.title}*\n` +
-        `Ubicación: ${p.location}\n` +
+        `Ubicación: ${p.location}${visitLine}\n` +
         `Mensaje: ${formData.message}\n` +
         `Mis datos:\n` +
         `- Email: ${formData.email}\n` +
@@ -153,10 +208,7 @@ export class PropertyDetail {
     }
 
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
-
-    // Abrimos WhatsApp en una nueva pestaña
     window.open(whatsappUrl, '_blank');
-    
     this.toastService.success('Abriendo WhatsApp...');
   }
 

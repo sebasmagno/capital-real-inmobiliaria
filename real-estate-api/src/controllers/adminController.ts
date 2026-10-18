@@ -64,6 +64,34 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       return { month: monthName, count };
     });
 
+    const [totalLeads, newLeadsCount, leadsByStatus, recentLeads] = await Promise.all([
+      prisma.lead.count(),
+      prisma.lead.count({ where: { status: 'NUEVO' } }),
+      prisma.lead.groupBy({
+        by: ['status'],
+        _count: { _all: true }
+      }),
+      prisma.lead.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          property: {
+            select: {
+              id: true,
+              title: true,
+              location: true
+            }
+          },
+          assignedAgent: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
+    ]);
+
     res.json({
       success: true,
       data: {
@@ -72,7 +100,11 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         propertiesByStatus,
         propertiesByType,
         recentProperties,
-        monthlyDistribution: distribution
+        monthlyDistribution: distribution,
+        totalLeads,
+        newLeadsCount,
+        leadsByStatus,
+        recentLeads
       }
     });
   } catch (error) {

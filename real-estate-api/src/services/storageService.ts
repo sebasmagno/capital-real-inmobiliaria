@@ -1,16 +1,25 @@
 import { supabase } from '../config/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs/promises';
+import path from 'path';
 
 export class StorageService {
   private static BUCKET_NAME = 'real-estate-uploads';
 
   /**
-   * Sube un archivo a Supabase Storage y retorna la URL pública
+   * Sube un archivo a Supabase Storage (o a /uploads local si no hay credenciales) y retorna la URL pública
    */
   static async uploadFile(file: Express.Multer.File, folder: string = 'general'): Promise<string> {
     const fileExt = file.originalname.split('.').pop();
-    const fileName = `${folder}/${uuidv4()}.${fileExt}`;
-    const filePath = fileName;
+    const fileName = `${uuidv4()}.${fileExt}`;
+    const filePath = `${folder}/${fileName}`;
+
+    if (!supabase) {
+      const localDir = path.join(__dirname, '../../uploads', folder);
+      await fs.mkdir(localDir, { recursive: true });
+      await fs.writeFile(path.join(localDir, fileName), file.buffer);
+      return `/uploads/${filePath}`;
+    }
 
     const { data, error } = await supabase.storage
       .from(this.BUCKET_NAME)
@@ -33,10 +42,17 @@ export class StorageService {
   }
 
   /**
-   * Elimina un archivo de Supabase Storage mediante su URL
+   * Elimina un archivo de Supabase Storage (o local) mediante su URL
    */
   static async deleteFile(url: string): Promise<void> {
     try {
+      if (!supabase || url.startsWith('/uploads/')) {
+        const relativePath = url.replace(/^\/uploads\//, '');
+        const localFilePath = path.join(__dirname, '../../uploads', relativePath);
+        await fs.unlink(localFilePath).catch(() => {});
+        return;
+      }
+
       // Extraer el path relativo de la URL pública de Supabase
       // Formato típico: https://xxx.supabase.co/storage/v1/object/public/bucket-name/folder/file.jpg
       const parts = url.split(`${this.BUCKET_NAME}/`);

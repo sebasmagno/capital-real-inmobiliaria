@@ -1,20 +1,23 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PropertyService } from '../../../core/services/property';
 import { ToastService } from '../../../core/services/toast.service';
+import { PropertyMap } from '../../../shared/components/property-map/property-map';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-property-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, PropertyMap],
   templateUrl: './admin-property-form.html',
   styleUrl: './admin-property-form.css'
 })
 export class AdminPropertyForm implements OnInit {
+  @ViewChild(PropertyMap) propertyMap?: PropertyMap;
+
   private fb = inject(FormBuilder);
   private propertyService = inject(PropertyService);
   private route = inject(ActivatedRoute);
@@ -35,7 +38,7 @@ export class AdminPropertyForm implements OnInit {
   apiUrl = environment.apiUrl;
   
   propertyTypes = [
-    { id: 'Apartamento', label: 'Apartamento', icon: '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" />' }, // Simple house/building
+    { id: 'Apartamento', label: 'Apartamento', icon: '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" />' },
     { id: 'Casa', label: 'Casa', icon: '<path d="M12 3L4 9V21H20V9L12 3ZM12 7.7C13.4 7.7 14.5 8.8 14.5 10.2C14.5 11.6 13.4 12.7 12 12.7C10.6 12.7 9.5 11.6 9.5 10.2C9.5 8.8 10.6 7.7 12 7.7ZM7 19V11.5L12 7.7L17 11.5V19H7Z" />' },
     { id: 'Apartaestudio', label: 'Apartaestudio', icon: '<path d="M3 13V3H21V13M3 17V21H21V17M11 7H13M11 9H13M11 11H13" />' },
     { id: 'Edificio', label: 'Edificio', icon: '<path d="M3 21V3H11V7H15V3H21V21H17V17H13V21H11V17H7V21H3Z" />' },
@@ -59,6 +62,58 @@ export class AdminPropertyForm implements OnInit {
     { id: 'Alquiler', label: 'Alquiler', icon: '<path d="M19 13V11H17V13H19ZM19 17V15H17V17H19ZM19 9V7H17V9H19ZM15 13V11H5V13H15ZM15 17V15H5V17H15ZM15 9V7H5V9H15Z" />' }
   ];
 
+  propertyConditions = [
+    'Para estrenar',
+    'Sobre planos',
+    'Excelente',
+    'Remodelado',
+    'Para remodelar'
+  ];
+
+  availableAmenities = [
+    'Piscina',
+    'Gimnasio',
+    'Seguridad 24/7',
+    'Ascensor',
+    'Balcón / Terraza',
+    'Zona BBQ',
+    'Salón Social',
+    'Parque Infantil',
+    'Zonas Verdes',
+    'Pet Friendly',
+    'Planta Eléctrica',
+    'Cuarto Útil / Depósito',
+    'Jacuzzi / Turco',
+    'Cancha Deportiva',
+    'Domótica',
+    'Aire Acondicionado',
+    'Vista Panorámica',
+    'Chimenea',
+    'Cocina Isla / Abierta',
+    'Parqueadero Visitantes'
+  ];
+
+  selectedAmenities = signal<string[]>([]);
+  customAmenityInput = signal('');
+
+  toggleAmenity(amenity: string) {
+    const current = this.selectedAmenities();
+    if (current.includes(amenity)) {
+      this.selectedAmenities.set(current.filter(a => a !== amenity));
+    } else {
+      this.selectedAmenities.set([...current, amenity]);
+    }
+  }
+
+  addCustomAmenity(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    if (!this.selectedAmenities().includes(trimmed)) {
+      this.selectedAmenities.set([...this.selectedAmenities(), trimmed]);
+    }
+    this.customAmenityInput.set('');
+  }
+
   selectType(typeId: string) {
     this.propertyForm.get('type')?.setValue(typeId);
   }
@@ -71,17 +126,45 @@ export class AdminPropertyForm implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(icon);
   }
 
+  onCoordinatesSelected(coords: { lat: number; lng: number }) {
+    this.propertyForm.patchValue({
+      latitude: coords.lat,
+      longitude: coords.lng
+    });
+  }
+
+  locateOnMap() {
+    const loc = this.propertyForm.get('location')?.value;
+    if (!loc || loc.trim().length < 2) {
+      this.toastService.warning('Escribe primero una ciudad o dirección en el campo Ubicación.');
+      return;
+    }
+    this.propertyMap?.searchAddress(loc);
+  }
+
   constructor() {
     this.propertyForm = this.fb.group({
+      code: [''],
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: [''],
       price: ['', [Validators.required, Validators.min(1)]],
+      adminFee: [null],
       location: ['', Validators.required],
+      latitude: [null],
+      longitude: [null],
       type: ['Casa', Validators.required],
       status: ['Venta', Validators.required],
+      propertyCondition: ['Excelente'],
       bedrooms: [1, [Validators.required, Validators.min(0)]],
       bathrooms: [1, [Validators.required, Validators.min(0)]],
+      garages: [1, [Validators.min(0)]],
       area: ['', [Validators.required, Validators.min(1)]],
+      builtArea: [null],
+      stratum: [null],
+      floor: [null],
+      yearBuilt: [null],
+      videoUrl: [''],
+      virtualTourUrl: [''],
       featured: [false]
     });
   }
@@ -101,26 +184,37 @@ export class AdminPropertyForm implements OnInit {
     this.isLoadingData.set(true);
     this.propertyService.getPropertyById(id).subscribe({
       next: (res) => {
-        setTimeout(() => {
-          if (res.success && res.data) {
-            this.propertyForm.patchValue({
-              title: res.data.title,
-              description: res.data.description,
-              price: res.data.price,
-              location: res.data.location,
-              type: res.data.type,
-              status: res.data.status,
-              bedrooms: res.data.bedrooms,
-              bathrooms: res.data.bathrooms,
-              area: res.data.area,
-              featured: res.data.featured
-            });
-            if (res.data.images) {
-              this.existingImages.set(res.data.images);
-            }
+        if (res.success && res.data) {
+          this.propertyForm.patchValue({
+            code: res.data.code ?? '',
+            title: res.data.title,
+            description: res.data.description,
+            price: res.data.price,
+            adminFee: res.data.adminFee ?? null,
+            location: res.data.location,
+            latitude: res.data.latitude ?? null,
+            longitude: res.data.longitude ?? null,
+            type: res.data.type,
+            status: res.data.status,
+            propertyCondition: res.data.propertyCondition ?? 'Excelente',
+            bedrooms: res.data.bedrooms,
+            bathrooms: res.data.bathrooms,
+            garages: res.data.garages ?? 0,
+            area: res.data.area,
+            builtArea: res.data.builtArea ?? null,
+            stratum: res.data.stratum ?? null,
+            floor: res.data.floor ?? null,
+            yearBuilt: res.data.yearBuilt ?? null,
+            videoUrl: res.data.videoUrl ?? '',
+            virtualTourUrl: res.data.virtualTourUrl ?? '',
+            featured: res.data.featured
+          });
+          this.selectedAmenities.set(Array.isArray(res.data.amenities) ? res.data.amenities : []);
+          if (res.data.images) {
+            this.existingImages.set(res.data.images);
           }
-          this.isLoadingData.set(false);
-        }, 800);
+        }
+        this.isLoadingData.set(false);
       },
       error: (err) => {
         this.toastService.error('No se pudo cargar la información de la propiedad.');
@@ -167,8 +261,15 @@ export class AdminPropertyForm implements OnInit {
     const formValues = this.propertyForm.value;
 
     Object.keys(formValues).forEach(key => {
-      formData.append(key, formValues[key]);
+      const val = formValues[key];
+      if (val !== null && val !== undefined) {
+        formData.append(key, String(val));
+      } else {
+        formData.append(key, '');
+      }
     });
+
+    formData.append('amenities', JSON.stringify(this.selectedAmenities()));
 
     if (this.selectedFiles.length > 0) {
       this.selectedFiles.forEach(file => {
