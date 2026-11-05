@@ -72,7 +72,27 @@
             }
           </div>
           <div class="p-5 sm:p-6 flex flex-col flex-grow">
-            <h3 class="text-xl font-bold text-slate-900 mb-1.5 group-hover:text-primary-600 transition-colors line-clamp-1" [title]="property.title">{{ property.title }}</h3>
+            <!-- 1. Valor / Precio encima -->
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-2xl font-bold text-primary-600 truncate">
+                {{ property.price | currency:'COP':'symbol':'1.0-0' }}
+                @if (property.status === 'Alquiler') {
+                  <span class="text-xs text-slate-500 font-medium">/mes</span>
+                }
+              </span>
+              @if (property.stratum) {
+                <span class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md shrink-0">
+                  Estrato {{ property.stratum }}
+                </span>
+              }
+            </div>
+
+            <!-- 2. Título -->
+            <h3 class="text-xl font-bold text-slate-900 mb-1.5 group-hover:text-primary-600 transition-colors line-clamp-1" [title]="property.title">
+              {{ property.title }}
+            </h3>
+
+            <!-- 3. Ubicación -->
             <p class="text-slate-500 text-sm mb-4 flex items-center gap-1.5">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-400 shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -81,8 +101,8 @@
               <span class="truncate">{{ property.location }}</span>
             </p>
 
-            <!-- Características con Iconos / Diseño responsivo anti-desborde -->
-            <div class="grid grid-cols-3 gap-2 py-3 px-3.5 bg-slate-50/90 rounded-xl border border-slate-100 text-slate-700 mb-5 mt-auto">
+            <!-- 4. Habitaciones, Baños y Área con Íconos -->
+            <div class="grid grid-cols-3 gap-2 py-3 px-3.5 bg-slate-50 rounded-xl border border-slate-100 text-slate-700 mb-5 mt-auto">
               <div class="flex items-center gap-1.5 min-w-0" title="Habitaciones">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-primary-600 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12v6m19.5-6v6M2.25 15h19.5M4.5 12V8.25A2.25 2.25 0 016.75 6h10.5A2.25 2.25 0 0119.5 8.25V12M8.25 9.75h.008v.008H8.25V9.75zm7.5 0h.008v.008H15.75V9.75z" />
@@ -109,18 +129,13 @@
               </div>
             </div>
 
-            <!-- Precio y Acción / Responsivo -->
-            <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
-              <span class="text-xl sm:text-2xl font-bold text-primary-600 truncate">
-                {{ property.price | currency:'COP':'symbol':'1.0-0' }}
-              </span>
-              <button routerLink="/propiedades/{{ property.id }}" class="text-primary-600 hover:text-primary-800 transition-colors font-medium text-xs sm:text-sm flex items-center gap-1 shrink-0">
-                Ver detalle
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 sm:w-4 sm:h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </button>
-            </div>
+            <!-- 5. Botón Ver Detalle -->
+            <button routerLink="/propiedades/{{ property.id }}" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-primary-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors">
+              Ver detalle
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
           </div>
         </div>
       }
