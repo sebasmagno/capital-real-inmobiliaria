@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
@@ -36,6 +36,19 @@ export class Properties implements OnInit {
   garagesFilter = signal('Todos');
   stratumFilter = signal('Todos');
   viewMode = signal<'grid' | 'split' | 'map'>('grid');
+  isMobileFilterOpen = signal(false);
+
+  activeFiltersCount = computed(() => {
+    let count = 0;
+    if (this.locationFilter().trim()) count++;
+    if (this.typeFilter() !== 'Todos') count++;
+    if (this.statusFilter() !== 'Todos') count++;
+    if (this.priceFilter() !== 'Sin Límite') count++;
+    if (this.bedroomsFilter() !== 'Todos') count++;
+    if (this.garagesFilter() !== 'Todos') count++;
+    if (this.stratumFilter() !== 'Todos') count++;
+    return count;
+  });
 
   propertyTypes = [
     { id: 'Todos', label: 'Todos', icon: '<path d="M12 2L2 19H22L12 2ZM12 6L19.53 17H4.47L12 6Z" />' },
