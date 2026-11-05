@@ -186,26 +186,32 @@ export class PropertyDetail {
       }).subscribe({ error: () => {} });
     }
 
-    if (this.contactForm.valid) {
-      const visitLine = formData.preferredDate
-        ? `\nFecha tentativa de visita: ${formData.preferredDate}`
-        : '';
-      message = encodeURIComponent(
-        `Hola, mi nombre es ${formData.name}.\n` +
-        `Me interesa la propiedad: *${p.title}*\n` +
-        `Ubicación: ${p.location}${visitLine}\n` +
-        `Mensaje: ${formData.message}\n` +
-        `Mis datos:\n` +
-        `- Email: ${formData.email}\n` +
-        `- Teléfono: ${formData.phone}`
-      );
-    } else {
-      message = encodeURIComponent(
-        `Hola, me interesa la propiedad: *${p.title}*\n` +
-        `Ubicación: ${p.location}\n\n` +
-        `Me gustaría recibir más información.`
-      );
+    const rawMessage = formData.message?.trim();
+    const customMessage = rawMessage || 'Hola, me interesa recibir más información sobre esta propiedad.';
+    
+    let messageText = `Hola, me interesa la propiedad: *${p.title}*`;
+    if (p.code) {
+      messageText += ` (Ref: ${p.code})`;
     }
+    messageText += `\nUbicación: ${p.location}`;
+
+    if (formData.name?.trim()) {
+      messageText = `Hola, mi nombre es *${formData.name.trim()}*.\n` + messageText;
+    }
+
+    if (formData.preferredDate) {
+      messageText += `\nFecha tentativa de visita: ${formData.preferredDate}`;
+    }
+
+    messageText += `\n\nMensaje: ${customMessage}`;
+
+    if (formData.phone?.trim() || formData.email?.trim()) {
+      messageText += `\n\nMis datos de contacto:`;
+      if (formData.phone?.trim()) messageText += `\n- Tel: ${formData.phone.trim()}`;
+      if (formData.email?.trim()) messageText += `\n- Email: ${formData.email.trim()}`;
+    }
+
+    message = encodeURIComponent(messageText);
 
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
     window.open(whatsappUrl, '_blank');
