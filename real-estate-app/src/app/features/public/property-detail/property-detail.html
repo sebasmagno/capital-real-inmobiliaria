@@ -68,47 +68,93 @@
         <!-- Main Details -->
         <div class="lg:col-span-2 space-y-10">
           
-          <!-- Key Stats -->
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-            <div class="px-3 col-span-2 sm:col-span-1">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Precio</p>
-              <div class="flex flex-col">
-                <p class="text-xl md:text-2xl font-black text-primary-600 leading-none">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</p>
-                @if (p.status === 'Alquiler') {
-                  <span class="text-xs text-slate-400 font-bold mt-1">/ MES</span>
-                }
-                @if (p.adminFee && p.adminFee > 0) {
-                  <span class="text-[11px] text-slate-500 font-semibold mt-1">
-                    + Admón: {{ p.adminFee | currency:'COP':'symbol':'1.0-0' }}
+          <!-- Key Stats & Price -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
+            <!-- Sección de Precio Destacado -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+              <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Precio de la propiedad</p>
+                <div class="flex items-baseline gap-2 flex-wrap">
+                  <span class="text-3xl sm:text-4xl font-black text-primary-600 tracking-tight">
+                    {{ p.price | currency:'COP':'symbol':'1.0-0' }}
                   </span>
+                  @if (p.status === 'Alquiler') {
+                    <span class="text-sm sm:text-base font-bold text-slate-500 uppercase">/ mes</span>
+                  }
+                </div>
+                @if (p.adminFee && p.adminFee > 0) {
+                  <p class="text-xs text-slate-500 font-semibold mt-1.5 flex items-center gap-1">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                    Administración: {{ p.adminFee | currency:'COP':'symbol':'1.0-0' }} / mes
+                  </p>
                 }
               </div>
-            </div>
-            
-            <div class="px-3 border-l border-slate-100">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Habs</p>
-              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bedrooms }}</p>
-            </div>
-            
-            <div class="px-3 border-l border-slate-100">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Baños</p>
-              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.bathrooms }}</p>
+              @if (p.code) {
+                <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-xs font-mono font-bold text-slate-700 self-start sm:self-auto">
+                  Ref: {{ p.code }}
+                </div>
+              }
             </div>
 
-            <div class="px-3 border-l border-slate-100">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Garajes</p>
-              <p class="text-2xl font-black text-slate-900 leading-none">{{ p.garages ?? 0 }}</p>
-            </div>
-            
-            <div class="px-3 border-l border-slate-100">
-              <p class="text-slate-400 text-[10px] mb-1 uppercase tracking-widest font-black">Área Total</p>
-              <div class="flex items-baseline gap-1">
-                <p class="text-2xl font-black text-slate-900 leading-none">{{ p.area }}</p>
-                <span class="text-xs font-bold text-slate-400">m²</span>
+            <!-- Características Principales con Íconos (Grid Responsivo 2 columnas en móvil, 4 en desktop) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+              <!-- Habitaciones -->
+              <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12v6m19.5-6v6M2.25 15h19.5M4.5 12V8.25A2.25 2.25 0 016.75 6h10.5A2.25 2.25 0 0119.5 8.25V12M8.25 9.75h.008v.008H8.25V9.75zm7.5 0h.008v.008H15.75V9.75z" />
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Habitaciones</p>
+                  <p class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">{{ p.bedrooms }}</p>
+                </div>
               </div>
-              @if (p.builtArea) {
-                <span class="text-[11px] text-slate-500 font-medium">Const: {{ p.builtArea }} m²</span>
-              }
+
+              <!-- Baños -->
+              <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16a1 1 0 011 1v3a4 4 0 01-4 4H7a4 4 0 01-4-4v-3a1 1 0 011-1zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v1" />
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Baños</p>
+                  <p class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">{{ p.bathrooms }}</p>
+                </div>
+              </div>
+
+              <!-- Garajes -->
+              <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Garajes</p>
+                  <p class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">{{ p.garages ?? 0 }}</p>
+                </div>
+              </div>
+
+              <!-- Área Total -->
+              <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Área Total</p>
+                  <div class="flex items-baseline gap-1">
+                    <p class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">{{ p.area }}</p>
+                    <span class="text-xs font-bold text-slate-400">m²</span>
+                  </div>
+                  @if (p.builtArea) {
+                    <span class="text-[10px] text-slate-500 font-medium truncate block">Const: {{ p.builtArea }} m²</span>
+                  }
+                </div>
+              </div>
             </div>
           </div>
 
