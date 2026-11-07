@@ -7,10 +7,12 @@ import {
   input,
   output,
   effect,
-  signal
+  signal,
+  inject,
+  PLATFORM_ID
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import * as L from 'leaflet';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import type * as LType from 'leaflet';
 import { Property } from '../../../core/services/property';
 import { environment } from '../../../../environments/environment';
 
@@ -51,6 +53,9 @@ import { environment } from '../../../../environments/environment';
 export class PropertyMap implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
+  private platformId = inject(PLATFORM_ID);
+  private L: any = null;
+
   mode = input<'single' | 'catalog' | 'picker'>('single');
   latitude = input<number | null | undefined>(null);
   longitude = input<number | null | undefined>(null);
@@ -66,9 +71,9 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
   currentLat = signal<number | null>(null);
   currentLng = signal<number | null>(null);
 
-  private map: L.Map | null = null;
-  private singleMarker: L.Marker | null = null;
-  private catalogLayerGroup: L.LayerGroup | null = null;
+  private map: any = null;
+  private singleMarker: any = null;
+  private catalogLayerGroup: any = null;
   private apiUrl = environment.apiUrl.replace('/api', '');
 
   // Coordenadas base por defecto: Pereira, Risaralda, Colombia
@@ -83,7 +88,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
       const loc = this.locationText();
       const props = this.properties();
 
-      if (!this.map) return;
+      if (!this.map || !this.L) return;
 
       if (currentMode === 'catalog') {
         this.renderCatalogMarkers(props);
@@ -93,8 +98,12 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.initMap();
+  async ngAfterViewInit(): Promise<void> {
+    if (isPlatformBrowser(this.platformId)) {
+      const leafletModule = await import('leaflet');
+      this.L = leafletModule.default || leafletModule;
+      this.initMap();
+    }
   }
 
   ngOnDestroy(): void {
@@ -105,24 +114,25 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
+    if (!this.L) return;
     const initialLat = this.latitude() ?? this.DEFAULT_LAT;
     const initialLng = this.longitude() ?? this.DEFAULT_LNG;
 
-    this.map = L.map(this.mapContainer.nativeElement, {
+    this.map = this.L.map(this.mapContainer.nativeElement, {
       center: [initialLat, initialLng],
       zoom: 14,
       scrollWheelZoom: false
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19
     }).addTo(this.map);
 
-    this.catalogLayerGroup = L.layerGroup().addTo(this.map);
+    this.catalogLayerGroup = this.L.layerGroup().addTo(this.map);
 
     if (this.mode() === 'picker') {
-      this.map.on('click', (e: L.LeafletMouseEvent) => {
+      this.map.on('click', (e: any) => {
         this.setPickerMarker(e.latlng.lat, e.latlng.lng, true);
       });
     }
@@ -137,7 +147,8 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
     }, 150);
   }
 
-  private createPinIcon(label?: string): L.DivIcon {
+  private createPinIcon(label?: string): any {
+    if (!this.L) return null;
     const badgeHtml = label
       ? `<div style="background:#0f172a;color:#ffffff;font-weight:800;font-size:11px;padding:4px 9px;border-radius:9999px;border:2px solid #ffffff;box-shadow:0 4px 12px rgba(15,23,42,0.35);white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">
            <span style="width:7px;height:7px;border-radius:9999px;background:#3b82f6;display:inline-block;"></span>
@@ -150,7 +161,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
            </svg>
          </div>`;
 
-    return L.divIcon({
+    return this.L.divIcon({
       className: 'custom-capital-real-pin',
       html: badgeHtml,
       iconSize: label ? [100, 32] : [36, 36],
@@ -164,7 +175,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
     lng: number | null | undefined,
     locText: string
   ): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
 
     if (lat != null && lng != null && !isNaN(lat) && !isNaN(lng)) {
       if (this.mode() === 'picker') {
@@ -184,14 +195,14 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
   }
 
   private setSingleMarker(lat: number, lng: number): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
     this.currentLat.set(lat);
     this.currentLng.set(lng);
 
     if (this.singleMarker) {
       this.singleMarker.setLatLng([lat, lng]);
     } else {
-      this.singleMarker = L.marker([lat, lng], {
+      this.singleMarker = this.L.marker([lat, lng], {
         icon: this.createPinIcon()
       }).addTo(this.map);
     }
@@ -209,7 +220,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
   }
 
   private setPickerMarker(lat: number, lng: number, emitChange: boolean): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
     const roundedLat = Number(lat.toFixed(6));
     const roundedLng = Number(lng.toFixed(6));
 
@@ -219,7 +230,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
     if (this.singleMarker) {
       this.singleMarker.setLatLng([roundedLat, roundedLng]);
     } else {
-      this.singleMarker = L.marker([roundedLat, roundedLng], {
+      this.singleMarker = this.L.marker([roundedLat, roundedLng], {
         icon: this.createPinIcon(),
         draggable: true
       }).addTo(this.map);
@@ -276,12 +287,12 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
   }
 
   private renderCatalogMarkers(properties: Property[]): void {
-    if (!this.map || !this.catalogLayerGroup) return;
+    if (!this.map || !this.catalogLayerGroup || !this.L) return;
 
     this.catalogLayerGroup.clearLayers();
     if (!properties || properties.length === 0) return;
 
-    const bounds: L.LatLngTuple[] = [];
+    const bounds: [number, number][] = [];
 
     properties.forEach((prop, index) => {
       // Si una propiedad antigua no tiene coordenadas aún, generamos una posición cercana a Pereira para visualización
@@ -309,7 +320,7 @@ export class PropertyMap implements AfterViewInit, OnDestroy {
           : `${this.apiUrl}${rawImg}`
         : '/uploads/placeholder.jpg';
 
-      const marker = L.marker([lat, lng], {
+      const marker = this.L.marker([lat, lng], {
         icon: this.createPinIcon(formattedPrice)
       });
 
