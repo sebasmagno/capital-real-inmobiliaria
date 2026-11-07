@@ -58,9 +58,13 @@
                 </a>
               </div>
 
-              <button class="w-full mt-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-primary-600 transition-all shadow-lg active:scale-95">
+              <a
+                [href]="agent.phone ? ('https://wa.me/' + agent.phone.replace(' ', '').replace('+', '').replace('-', '')) : ('mailto:' + agent.email)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-full mt-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-primary-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
                 Contactar Agente
-              </button>
+              </a>
             </div>
           </div>
         }
