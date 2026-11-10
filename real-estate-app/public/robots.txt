@@ -7,4 +7,4 @@ Disallow: /admin/
 Disallow: /login
 
 # Ruta al mapa del sitio
-Sitemap: https://capitalrealinmobiliaria.vercel.app/sitemap.xml
+Sitemap: https://www.capitalrealinmobiliaria.com/sitemap.xml
