@@ -31,6 +31,8 @@ export class AdminPropertyForm implements OnInit {
   
   isSaving = signal(false);
   isLoadingData = signal(false);
+  showValidationSummary = signal(false);
+  missingFields = signal<string[]>([]);
   
   selectedFiles: File[] = [];
   imagePreviews = signal<string[]>([]);
@@ -248,13 +250,58 @@ export class AdminPropertyForm implements OnInit {
     this.imagePreviews.set(currentPreviews);
   }
 
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.propertyForm.get(fieldName);
+    return !!(control && control.invalid && (control.touched || control.dirty || this.showValidationSummary()));
+  }
+
+  getMissingRequiredFields(): string[] {
+    const missing: string[] = [];
+    const f = this.propertyForm;
+
+    if (f.get('title')?.invalid) missing.push('Título de la propiedad (mínimo 5 letras)');
+    if (f.get('price')?.invalid) missing.push('Precio principal de la propiedad');
+    if (f.get('location')?.invalid) missing.push('Ubicación / Barrio / Ciudad');
+    if (f.get('type')?.invalid) missing.push('Tipo de inmueble');
+    if (f.get('status')?.invalid) missing.push('Modalidad (Venta / Alquiler)');
+    if (f.get('bedrooms')?.invalid) missing.push('Número de habitaciones');
+    if (f.get('bathrooms')?.invalid) missing.push('Número de baños');
+    if (f.get('area')?.invalid) missing.push('Área total / lote (m²)');
+    
+    if (!this.isEditMode() && this.selectedFiles.length === 0) {
+      missing.push('Al menos una fotografía de la propiedad');
+    }
+
+    return missing;
+  }
+
   onSubmit() {
-    if (this.propertyForm.invalid) {
+    const missing = this.getMissingRequiredFields();
+
+    if (missing.length > 0) {
       this.propertyForm.markAllAsTouched();
-      this.toastService.warning('Por favor, completa los campos requeridos.');
+      this.showValidationSummary.set(true);
+      this.missingFields.set(missing);
+      this.toastService.warning(`Faltan ${missing.length} campo(s) obligatorio(s) por completar.`);
+
+      // Auto-scroll suave hacia el panel de alerta o el primer campo con error
+      setTimeout(() => {
+        const summary = document.getElementById('validation-summary');
+        if (summary) {
+          summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          const firstInvalid = document.querySelector('.ng-invalid[formControlName]');
+          if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }, 100);
+
       return;
     }
 
+    this.showValidationSummary.set(false);
+    this.missingFields.set([]);
     this.isSaving.set(true);
 
     const formData = new FormData();
@@ -283,7 +330,6 @@ export class AdminPropertyForm implements OnInit {
           console.log('[AdminPropertyForm] Update response:', res);
           setTimeout(() => {
             this.isSaving.set(false);
-            // Mostramos el toast si la respuesta existe (asumimos éxito si no hay error)
             this.toastService.success('Propiedad actualizada correctamente');
             this.router.navigate(['/admin']);
           }, 600);
@@ -295,12 +341,6 @@ export class AdminPropertyForm implements OnInit {
         }
       });
     } else {
-      if (this.selectedFiles.length === 0) {
-        this.toastService.warning('Debes seleccionar al menos una imagen');
-        this.isSaving.set(false);
-        return;
-      }
-
       this.propertyService.createProperty(formData).subscribe({
         next: (res) => {
           console.log('[AdminPropertyForm] Create response:', res);
