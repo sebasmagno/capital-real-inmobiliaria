@@ -1,7 +1,10 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
+  let token: string | null = null;
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    token = localStorage.getItem('token');
+  }
 
   // Solo adjuntar el token si la petición va a /api/admin
   if (token && req.url.includes('/api/admin')) {
