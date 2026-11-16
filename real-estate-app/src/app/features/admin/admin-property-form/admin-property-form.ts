@@ -34,6 +34,7 @@ export class AdminPropertyForm implements OnInit {
   showValidationSummary = signal(false);
   missingFields = signal<string[]>([]);
   
+  readonly MAX_IMAGES = 15;
   selectedFiles: File[] = [];
   imagePreviews = signal<string[]>([]);
   existingImages = signal<{ url: string }[]>([]);
@@ -227,14 +228,24 @@ export class AdminPropertyForm implements OnInit {
 
   onFileSelected(event: any) {
     if (event.target.files && event.target.files.length > 0) {
-      this.selectedFiles = Array.from(event.target.files);
-      
-      const previews: string[] = [];
-      this.selectedFiles.forEach(file => {
+      let files = Array.from(event.target.files as FileList);
+
+      if (files.length > this.MAX_IMAGES) {
+        this.toastService.warning(`Solo puedes seleccionar hasta ${this.MAX_IMAGES} fotos como máximo. Se tomaron las primeras ${this.MAX_IMAGES}.`);
+        files = files.slice(0, this.MAX_IMAGES);
+      }
+
+      this.selectedFiles = files;
+
+      const previews: string[] = new Array(this.selectedFiles.length);
+      let loaded = 0;
+
+      this.selectedFiles.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = (e: any) => {
-          previews.push(e.target.result);
-          if (previews.length === this.selectedFiles.length) {
+          previews[index] = e.target.result;
+          loaded++;
+          if (loaded === this.selectedFiles.length) {
             this.imagePreviews.set(previews);
           }
         };

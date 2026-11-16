@@ -38,8 +38,8 @@ router.put('/users/:id', uploadImages.single('image'), updateUser); // El propio
 router.delete('/users/:id', isAdmin, deleteUser);
 
 // Gestión de propiedades
-router.post('/properties', uploadImages.array('images', 10), createProperty);
-router.put('/properties/:id', uploadImages.array('images', 10), updateProperty);
+router.post('/properties', uploadImages.array('images', 15), createProperty);
+router.put('/properties/:id', uploadImages.array('images', 15), updateProperty);
 router.delete('/properties/:id', isAdmin, deleteProperty);
 
 // Configuración de la empresa - Solo Admin

@@ -419,11 +419,19 @@
         <div>
           <div class="flex items-center justify-between mb-2">
             <label class="block text-sm font-bold text-slate-700">Imágenes de la propiedad <span class="text-rose-500">{{ !isEditMode() ? '*' : '' }}</span></label>
-            @if (!isEditMode()) {
-              <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 uppercase tracking-wider">Mínimo 1 requerida</span>
-            } @else {
-              <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Opcional al editar</span>
-            }
+            <div class="flex items-center gap-2">
+              @if (selectedFiles.length > 0) {
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-md border"
+                      [ngClass]="selectedFiles.length === MAX_IMAGES ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-primary-50 text-primary-700 border-primary-200'">
+                  {{ selectedFiles.length }} / {{ MAX_IMAGES }} fotos
+                </span>
+              }
+              @if (!isEditMode()) {
+                <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 uppercase tracking-wider">Mín. 1 - Máx. 15</span>
+              } @else {
+                <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase tracking-wider">Máx. 15 fotos</span>
+              }
+            </div>
           </div>
           
           <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-2xl transition-all"
@@ -441,7 +449,7 @@
                 </label>
                 <p class="pl-2 self-center">o arrastra aquí</p>
               </div>
-              <p class="text-xs text-slate-500 font-medium">PNG, JPG, WEBP hasta 10 fotos a la vez</p>
+              <p class="text-xs text-slate-500 font-medium">PNG, JPG, WEBP — Puedes seleccionar hasta 15 fotos como máximo</p>
             </div>
           </div>
 
