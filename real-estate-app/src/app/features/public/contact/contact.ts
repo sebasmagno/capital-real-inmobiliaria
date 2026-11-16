@@ -1,8 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigService } from '../../../core/services/config';
 import { LeadService } from '../../../core/services/lead';
 import { ToastService } from '../../../core/services/toast.service';
+import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'app-contact',
@@ -10,10 +11,11 @@ import { ToastService } from '../../../core/services/toast.service';
   templateUrl: './contact.html',
   styleUrl: './contact.css',
 })
-export class Contact {
+export class Contact implements OnInit {
   configService = inject(ConfigService);
   private leadService = inject(LeadService);
   private toastService = inject(ToastService);
+  private seoService = inject(SeoService);
   
   nombre = signal('');
   apellidos = signal('');
@@ -22,6 +24,15 @@ export class Contact {
   mensaje = signal('');
   isSending = signal(false);
   enviado = signal(false);
+
+  ngOnInit(): void {
+    this.seoService.setPageSEO({
+      title: 'Contacto y Ubicación | CAPITAL REAL INMOBILIARIA Pereira',
+      description: 'Ponte en contacto con CAPITAL REAL INMOBILIARIA en Pereira. Asesoría para compra, venta y arriendo de propiedades. Visítanos o comunícate vía WhatsApp.',
+      keywords: 'contacto inmobiliaria pereira, oficina capital real, telefono inmobiliaria pereira',
+      url: '/contacto'
+    });
+  }
 
   private buildFullName(): string {
     return `${this.nombre().trim()} ${this.apellidos().trim()}`.trim();

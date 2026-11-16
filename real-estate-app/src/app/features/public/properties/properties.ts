@@ -2,8 +2,8 @@ import { Component, inject, signal, computed, OnInit, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
+import { SeoService } from '../../../core/services/seo.service';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SkeletonProperty } from '../../../shared/components/skeleton-property/skeleton-property';
@@ -19,13 +19,7 @@ export class Properties implements OnInit {
   private propertyService = inject(PropertyService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private sanitizer = inject(DomSanitizer);
-  private titleService = inject(Title);
-  private metaService = inject(Meta);
-
-  getSafeIcon(icon: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(icon);
-  }
+  private seoService = inject(SeoService);
 
   // Filter & View state
   locationFilter = signal('');
@@ -51,12 +45,12 @@ export class Properties implements OnInit {
   });
 
   propertyTypes = [
-    { id: 'Todos', label: 'Todos', icon: '<path d="M12 2L2 19H22L12 2ZM12 6L19.53 17H4.47L12 6Z" />' },
-    { id: 'Casa', label: 'Casa', icon: '<path d="M12 3L4 9V21H20V9L12 3ZM12 7.7L17 11.5V19H7V11.5L12 7.7Z" />' },
-    { id: 'Apartamento', label: 'Apartamento', icon: '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" />' },
-    { id: 'Villa', label: 'Villa', icon: '<path d="M12 3L4 9V21H20V9L12 3ZM12 7.7C13.4 7.7 14.5 8.8 14.5 10.2C14.5 11.6 13.4 12.7 12 12.7C10.6 12.7 9.5 11.6 9.5 10.2C9.5 8.8 10.6 7.7 12 7.7ZM7 19V11.5L12 7.7L17 11.5V19H7Z" />' },
-    { id: 'Oficina', label: 'Oficina', icon: '<path d="M20 6H4V4H20V6ZM20 8H4V20H20V8ZM14 12H10V10H14V12Z" />' },
-    { id: 'Local', label: 'Local', icon: '<path d="M12 2L2 7V12H22V7L12 2ZM4 14V20H10V14H4ZM14 14V20H20V14H14Z" />' }
+    { id: 'Todos', label: 'Todos', path: 'M12 2L2 19H22L12 2ZM12 6L19.53 17H4.47L12 6Z' },
+    { id: 'Casa', label: 'Casa', path: 'M12 3L4 9V21H20V9L12 3ZM12 7.7L17 11.5V19H7V11.5L12 7.7Z' },
+    { id: 'Apartamento', label: 'Apartamento', path: 'M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z' },
+    { id: 'Villa', label: 'Villa', path: 'M12 3L4 9V21H20V9L12 3ZM12 7.7C13.4 7.7 14.5 8.8 14.5 10.2C14.5 11.6 13.4 12.7 12 12.7C10.6 12.7 9.5 11.6 9.5 10.2C9.5 8.8 10.6 7.7 12 7.7ZM7 19V11.5L12 7.7L17 11.5V19H7Z' },
+    { id: 'Oficina', label: 'Oficina', path: 'M20 6H4V4H20V6ZM20 8H4V20H20V8ZM14 12H10V10H14V12Z' },
+    { id: 'Local', label: 'Local', path: 'M12 2L2 7V12H22V7L12 2ZM4 14V20H10V14H4ZM14 14V20H20V14H14Z' }
   ];
   
   private locationSubject = new Subject<string>();
@@ -107,7 +101,12 @@ export class Properties implements OnInit {
   }
 
   ngOnInit() {
-    // Initial fetch triggered by effect, but we can keep ngOnInit for other logic
+    this.seoService.setPageSEO({
+      title: 'Casas y Apartamentos en Venta y Arriendo en Pereira | CAPITAL REAL',
+      description: 'Explora nuestro catálogo de casas campestres, apartamentos, lotes y locales en Pereira, Dosquebradas y el Eje Cafetero. Filtra por precio, habitaciones y sector.',
+      keywords: 'propiedades pereira, venta casas pereira, arriendo apartamentos pereira, fincas eje cafetero, inmobiliaria pereira',
+      url: '/propiedades'
+    });
   }
 
   fetchProperties(filters: {
@@ -136,18 +135,20 @@ export class Properties implements OnInit {
   }
 
   private updateSEO(location: string, type: string) {
-    let title = 'Catálogo de Propiedades | CAPITAL REAL';
-    let description = 'Explora nuestro catálogo completo de casas, apartamentos y locales comerciales.';
+    let title = 'Casas y Apartamentos en Venta y Arriendo en Pereira | CAPITAL REAL';
+    let description = 'Explora nuestro catálogo completo de casas campestres, apartamentos y locales en Pereira y el Eje Cafetero.';
 
     if (location || type !== 'Todos') {
       title = `${type !== 'Todos' ? type : 'Propiedades'} ${location ? 'en ' + location : ''} | CAPITAL REAL`;
-      description = `Encuentra las mejores opciones de ${type.toLowerCase()} ${location ? 'en ' + location : ''}. Resultados actualizados y exclusivos.`;
+      description = `Encuentra las mejores opciones de ${type.toLowerCase()} ${location ? 'en ' + location : ''}. Resultados actualizados y exclusivos en Pereira y Eje Cafetero.`;
     }
 
-    this.titleService.setTitle(title);
-    this.metaService.updateTag({ name: 'description', content: description });
-    this.metaService.updateTag({ property: 'og:title', content: title });
-    this.metaService.updateTag({ property: 'og:description', content: description });
+    this.seoService.setPageSEO({
+      title,
+      description,
+      keywords: `${type !== 'Todos' ? type.toLowerCase() : 'propiedades'}, bienes raices pereira, comprar ${type.toLowerCase()} pereira`,
+      url: '/propiedades'
+    });
   }
 
   resetFilters() {

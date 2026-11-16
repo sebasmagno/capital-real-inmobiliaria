@@ -27,7 +27,6 @@ export class App {
 
   constructor() {
     this.configService.loadSettings();
-    this.toastService.success('Sistema de Notificaciones Activo');
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {

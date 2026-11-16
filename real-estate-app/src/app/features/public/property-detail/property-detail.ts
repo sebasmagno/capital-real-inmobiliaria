@@ -1,12 +1,13 @@
-import { Component, inject, signal, input, effect } from '@angular/core';
+import { Component, inject, signal, input, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { Title, Meta, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PropertyService, Property } from '../../../core/services/property';
 import { LeadService } from '../../../core/services/lead';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfigService } from '../../../core/services/config';
+import { SeoService } from '../../../core/services/seo.service';
 import { environment } from '../../../../environments/environment';
 import { PropertyMap } from '../../../shared/components/property-map/property-map';
 
@@ -17,14 +18,13 @@ import { PropertyMap } from '../../../shared/components/property-map/property-ma
   templateUrl: './property-detail.html',
   styleUrl: './property-detail.css'
 })
-export class PropertyDetail {
+export class PropertyDetail implements OnDestroy {
   private propertyService = inject(PropertyService);
   private leadService = inject(LeadService);
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   public configService = inject(ConfigService);
-  private titleService = inject(Title);
-  private metaService = inject(Meta);
+  private seoService = inject(SeoService);
   private sanitizer = inject(DomSanitizer);
   
   // Recibimos el ID directamente del Router mediante un input de señal
@@ -99,20 +99,76 @@ export class PropertyDetail {
     });
   }
 
+  ngOnDestroy(): void {
+    this.seoService.removeJsonLd('property-detail-jsonld');
+  }
+
   private updateSEO(p: Property) {
-    const title = `${p.title} en ${p.location} | CAPITAL REAL`;
-    const description = `${p.type} en ${p.status} con ${p.bedrooms} habitaciones y ${p.bathrooms} baños. Precio: ${p.price}.`;
-    
-    this.titleService.setTitle(title);
-    this.metaService.updateTag({ name: 'description', content: description });
-    
-    // Open Graph
-    this.metaService.updateTag({ property: 'og:title', content: title });
-    this.metaService.updateTag({ property: 'og:description', content: description });
+    const formattedPrice = new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 0
+    }).format(p.price);
+
+    const refCode = p.code ? ` (Ref: ${p.code})` : '';
+    const title = `${p.title} en ${p.status} en ${p.location}${refCode}`;
+    const description = `${p.type} en ${p.status} en ${p.location}. ${p.bedrooms} habitaciones, ${p.bathrooms} baños, ${p.area} m² área. Precio: ${formattedPrice}. ¡Agenda tu visita con CAPITAL REAL!`;
+    const keywords = `${p.type} en ${p.status} pereira, inmuebles en ${p.location}, casas apartamentos pereira, capital real inmobiliaria`;
+    const url = `/propiedades/${p.id}`;
+
+    let imageUrl = 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9';
     if (p.images && p.images.length > 0) {
-      const imageUrl = p.images[0].url.startsWith('http') ? p.images[0].url : this.apiUrl.replace('/api', '') + p.images[0].url;
-      this.metaService.updateTag({ property: 'og:image', content: imageUrl });
+      imageUrl = p.images[0].url.startsWith('http') ? p.images[0].url : this.apiUrl.replace('/api', '') + p.images[0].url;
     }
+
+    this.seoService.setPageSEO({
+      title,
+      description,
+      keywords,
+      url,
+      image: imageUrl,
+      type: 'product'
+    });
+
+    // Inyectar Schema.org JSON-LD para Google Rich Results
+    const allImages = p.images?.map(img => img.url.startsWith('http') ? img.url : this.apiUrl.replace('/api', '') + img.url) || [imageUrl];
+    const schemaType = p.type === 'Apartamento' ? 'Apartment' : (p.type === 'Casa' ? 'SingleFamilyResidence' : 'RealEstateListing');
+
+    this.seoService.setJsonLd({
+      '@context': 'https://schema.org',
+      '@type': schemaType,
+      'name': p.title,
+      'description': p.description || description,
+      'url': `https://www.capitalrealinmobiliaria.com/propiedades/${p.id}`,
+      'image': allImages,
+      'numberOfBedrooms': p.bedrooms,
+      'numberOfBathroomsTotal': p.bathrooms,
+      'floorSize': {
+        '@type': 'QuantitativeValue',
+        'value': p.area,
+        'unitCode': 'MTK'
+      },
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': p.location,
+        'addressRegion': 'Risaralda',
+        'addressCountry': 'CO'
+      },
+      ...(p.latitude && p.longitude ? {
+        'geo': {
+          '@type': 'GeoCoordinates',
+          'latitude': p.latitude,
+          'longitude': p.longitude
+        }
+      } : {}),
+      'offers': {
+        '@type': 'Offer',
+        'price': p.price,
+        'priceCurrency': 'COP',
+        'availability': 'https://schema.org/InStock',
+        'validFrom': p.createdAt
+      }
+    }, 'property-detail-jsonld');
   }
 
   sendInquiry() {

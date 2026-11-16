@@ -97,7 +97,7 @@
                   <svg viewBox="0 0 24 24" 
                     class="w-6 h-6 fill-current transition-transform group-hover:scale-110"
                     [ngClass]="typeFilter() === type.id ? 'text-primary-400' : 'text-slate-300 group-hover:text-slate-400'">
-                    <g [innerHTML]="getSafeIcon(type.icon)"></g>
+                    <path [attr.d]="type.path" />
                   </svg>
                   
                   <span class="uppercase tracking-tight">{{ type.label }}</span>

@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AdminService, User } from '../../../core/services/admin';
+import { SeoService } from '../../../core/services/seo.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../environments/environment';
 
@@ -14,12 +15,20 @@ import { SkeletonAgent } from '../../../shared/components/skeleton-agent/skeleto
 })
 export class Agents implements OnInit {
   private adminService = inject(AdminService);
+  private seoService = inject(SeoService);
   
   agents = signal<User[]>([]);
   isLoading = signal(true);
   apiUrl = environment.apiUrl;
 
   ngOnInit() {
+    this.seoService.setPageSEO({
+      title: 'Equipo de Asesores Inmobiliarios | CAPITAL REAL INMOBILIARIA Pereira',
+      description: 'Conoce a nuestro equipo de asesores inmobiliarios expertos en Pereira y el Eje Cafetero. Te brindamos asesoría confiable para comprar, vender o arrendar tu propiedad.',
+      keywords: 'asesores inmobiliarios pereira, agentes de bienes raices pereira, capital real asesores',
+      url: '/agentes'
+    });
+
     this.adminService.getPublicAgents().subscribe({
       next: (res) => {
         if (res.success) {
